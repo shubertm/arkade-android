@@ -4,9 +4,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * Test decoding and encoding Ark addresses, generating Taproot ScriptPubKey and SubDust ScriptPubKey
  */
 class ArkAddressTest {
     @Test
@@ -23,17 +21,26 @@ class ArkAddressTest {
         val serverPubKey = decoded.serverPubKey.toHexString()
         assertEquals(
             "33ffb3dee353b1a9ebe4ced64b946238d0a4ac364f275d771da6ad2445d07ae0",
-            serverPubKey
+            serverPubKey,
         )
 
         val vtxoTaprootKey = decoded.vtxoTaprootPubKey.toHexString()
         assertEquals(
             "25a43cecfa0e1b1a4f72d64ad15f4cfa7a84d0723e8511c969aa543638ea9967",
-            vtxoTaprootKey
+            vtxoTaprootKey,
         )
 
         val encoded = decoded.encode()
 
         assertEquals(address, encoded)
+
+        assertEquals(
+            "512025a43cecfa0e1b1a4f72d64ad15f4cfa7a84d0723e8511c969aa543638ea9967",
+            decoded.toP2TRScriptPubkey().toHexString(),
+        )
+        assertEquals(
+            "6a2025a43cecfa0e1b1a4f72d64ad15f4cfa7a84d0723e8511c969aa543638ea9967",
+            decoded.toSubDustScriptPubkey().toHexString(),
+        )
     }
 }

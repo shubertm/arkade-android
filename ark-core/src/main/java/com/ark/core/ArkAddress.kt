@@ -27,7 +27,7 @@ class ArkAddress(
     val hrp: String,
     val version: Int,
     val serverPubKey: ByteArray,
-    val vtxoTaprootPubKey: ByteArray
+    val vtxoTaprootPubKey: ByteArray,
 ) {
     init {
         val pubKeySize = serverPubKey.size
@@ -40,6 +40,9 @@ class ArkAddress(
         }
     }
 
+    /**
+     * Generate an Ark address as a Bech32m `String`
+     * */
     fun encode(): String {
         var bytes = ByteArray(1)
         bytes[0] = this.version.toByte()
@@ -48,21 +51,33 @@ class ArkAddress(
         return address
     }
 
+    /**
+     * Creates a P2TR witness program from [vtxoTaprootPubKey]
+     */
     fun toP2TRScriptPubkey(): ByteArray {
-        val scriptPubkey = Script.write(
-            listOf(OP_1, OP_PUSHDATA(vtxoTaprootPubKey))
-        )
+        val scriptPubkey =
+            Script.write(
+                listOf(OP_1, OP_PUSHDATA(vtxoTaprootPubKey)),
+            )
         return scriptPubkey
     }
 
+    /**
+     * Creates an `OP_RETURN` from [vtxoTaprootPubKey]
+     */
     fun toSubDustScriptPubkey(): ByteArray {
-        val scriptPubkey = Script.write(
-            listOf(OP_RETURN, OP_PUSHDATA(vtxoTaprootPubKey))
-        )
+        val scriptPubkey =
+            Script.write(
+                listOf(OP_RETURN, OP_PUSHDATA(vtxoTaprootPubKey)),
+            )
         return scriptPubkey
     }
 
     companion object {
+        /**
+         * Creates a new `ArkAddress` from a Bech32m `String`
+         * @param address
+         */
         fun decode(address: String): ArkAddress {
             val (hrp, bytes, enc) = Bech32.decodeBytes(address)
             val version = bytes[0].toInt()
@@ -72,7 +87,7 @@ class ArkAddress(
                 hrp,
                 version,
                 serverPubKey,
-                vtxoTaprootKey
+                vtxoTaprootKey,
             )
         }
     }
