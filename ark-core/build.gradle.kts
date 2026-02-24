@@ -1,6 +1,9 @@
+import com.android.build.gradle.internal.tasks.factory.dependsOn
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ktlint.gradle)
 }
 
 android {
@@ -21,7 +24,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -44,3 +47,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
+
+tasks.preBuild.dependsOn("ktlintCheck")
+tasks.ktlintCheck.dependsOn("ktlintFormat")
