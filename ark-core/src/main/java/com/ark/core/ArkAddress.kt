@@ -30,13 +30,12 @@ class ArkAddress(
     val vtxoTaprootPubKey: ByteArray,
 ) {
     init {
+        require(version == 0) { "Unsupported address version: $version" }
         val pubKeySize = serverPubKey.size
         val taprootKeySize = vtxoTaprootPubKey.size
-        if (pubKeySize != 32) {
-            throw IllegalStateException("Invalid server public key length, expected 32 bytes, got $pubKeySize")
-        }
-        if (taprootKeySize != 32) {
-            throw IllegalStateException("Invalid vtxo taproot public key length, expected 32 bytes, got $taprootKeySize")
+        require (pubKeySize == 32) { "Invalid server public key length, expected 32 bytes, got $pubKeySize" }
+        require (taprootKeySize == 32) {
+            "Invalid vtxo taproot public key length, expected 32 bytes, got $taprootKeySize"
         }
     }
 
@@ -79,15 +78,20 @@ class ArkAddress(
          * @param address
          */
         fun decode(address: String): ArkAddress {
-            val (hrp, bytes, enc) = Bech32.decodeBytes(address)
+            val (hrp, bytes, encoding) = Bech32.decodeBytes(address)
+            require(encoding == Bech32.Encoding.Bech32m) { "Invalid Bech32 encoding: $encoding" }
+            val bytesSize = bytes.size
+            require(bytesSize == 65) { "Invalid payload length: $bytesSize" }
             val version = bytes[0].toInt()
+            require(version == 0) { "Unsupported address version: $version" }
+
             val serverPubKey = bytes.copyOfRange(1, 33)
-            val vtxoTaprootKey = bytes.copyOfRange(33, 65)
+            val vtxoTaprootPubKey = bytes.copyOfRange(33, 65)
             return ArkAddress(
                 hrp,
                 version,
                 serverPubKey,
-                vtxoTaprootKey,
+                vtxoTaprootPubKey,
             )
         }
     }
