@@ -21,7 +21,9 @@ import fr.acinq.bitcoin.Script
  *
  * [vtxoTaprootPubKey] is the Taproot output key containing collaborative and exit script paths (32 bytes)
  *
- * @throws IllegalStateException if the [serverPubKey] or [vtxoTaprootPubKey] provided are not exactly 32 bytes
+ * @throws IllegalArgumentException
+ * * if the address [version] provided is not supported
+ * * if [serverPubKey] or [vtxoTaprootPubKey] provided are not exactly 32 bytes
  */
 class ArkAddress(
     val hrp: String,
@@ -33,8 +35,8 @@ class ArkAddress(
         require(version == 0) { "Unsupported address version: $version" }
         val pubKeySize = serverPubKey.size
         val taprootKeySize = vtxoTaprootPubKey.size
-        require (pubKeySize == 32) { "Invalid server public key length, expected 32 bytes, got $pubKeySize" }
-        require (taprootKeySize == 32) {
+        require(pubKeySize == 32) { "Invalid server public key length, expected 32 bytes, got $pubKeySize" }
+        require(taprootKeySize == 32) {
             "Invalid vtxo taproot public key length, expected 32 bytes, got $taprootKeySize"
         }
     }
@@ -44,7 +46,7 @@ class ArkAddress(
      * */
     fun encode(): String {
         var bytes = ByteArray(1)
-        bytes[0] = this.version.toByte()
+        bytes[0] = version.toByte()
         bytes = bytes + serverPubKey + vtxoTaprootPubKey
         val address = Bech32.encodeBytes(hrp, bytes, Bech32.Encoding.Bech32m)
         return address
@@ -76,6 +78,10 @@ class ArkAddress(
         /**
          * Creates a new `ArkAddress` from a Bech32m `String`
          * @param address
+         * @throws IllegalArgumentException
+         * * if the address encoding is not Bech32m
+         * * if the address payload is not exactly 65 bytes.
+         * * if the address version is not supported
          */
         fun decode(address: String): ArkAddress {
             val (hrp, bytes, encoding) = Bech32.decodeBytes(address)
