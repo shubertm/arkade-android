@@ -19,7 +19,7 @@ through a native Rust core.
 ## Phase 2: Client Communication (ark-client)
 ### Goal: Enable the Android SDK to communicate with Ark service providers (ASPs).
 #### Technical Tasks:
-- Port the gRPC/Rest client logic from the ark-client crate.
+- Port the gRPC/REST client logic from the ark-client crate.
 - Use Kotlin Coroutines for non-blocking UI calls.
 
 ##### Milestone: Successful "ping" or "status check" from an Android Emulator to an Ark backend.
@@ -30,7 +30,7 @@ through a native Rust core.
 - Port the ark-fees logic to handle out-of-band and in-protocol fee structures.
 - Expose fee-rate providers to the Kotlin layer for real-time UI updates.
 
-##### Milestone: Successful integration tests' fees estimation and calculation.
+##### Milestone: Successful integration tests fees estimation and calculation.
 
 ## Phase 4: Wallet Integration (ark-bdk-wallet)
 ### Goal: Full wallet functionality integrating on-chain Bitcoin via BDK.
