@@ -9,6 +9,10 @@ enum class Parity {
     ;
 
     companion object {
+        /**
+         * Determines a [Parity] using the provided `Boolean`
+         * Returns [Odd] when the Boolean is true else [Even]
+         */
         fun fromBooleanIsOdd(isOdd: Boolean): Parity {
             if (isOdd) {
                 return Odd
@@ -16,6 +20,10 @@ enum class Parity {
             return Even
         }
 
+        /**
+         * Determines a [Parity] using the provided `Boolean`
+         * Returns [Even] when the Boolean is true else [Odd]
+         */
         fun fromBooleanIsEven(isEven: Boolean): Parity {
             if (isEven) {
                 return Even

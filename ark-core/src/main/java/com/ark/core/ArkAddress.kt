@@ -76,7 +76,7 @@ class ArkAddress(
 
     companion object {
         /**
-         * Creates a new `ArkAddress` from a Bech32m `String`
+         * Creates a new [ArkAddress] from a Bech32m `String`
          * @param address
          * @throws IllegalArgumentException
          * * if the address encoding is not Bech32m
