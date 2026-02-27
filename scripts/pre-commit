@@ -4,17 +4,24 @@
 
 status=$?
 if [ "$status" != 0 ]; then
-  echo "ktlintFormat failed, format code again manually!"
+  echo "ktlintCheck failed, format code again manually!"
   exit 1
 fi
 
 ./gradlew testDebugUnitTest
+
+status=$?
+if [ "$status" != 0 ]; then
+  echo "Some debug unit tests are failing!"
+  exit 1
+fi
+
 ./gradlew testReleaseUnitTest
 
 status=$?
 if [ "$status" = 0 ]; then
   printf "\nCode style is good\nAll unit tests passed"
 else
-  echo "Some unit tests are failing!"
+  echo "Some release unit tests are failing!"
   exit 1
 fi
