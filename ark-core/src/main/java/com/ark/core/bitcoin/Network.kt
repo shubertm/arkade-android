@@ -1,3 +1,8 @@
 package com.ark.core.bitcoin
 
-class Network
+enum class Network {
+    MAINNET,
+    TESTNET,
+    SIGNET,
+    REGTEST,
+}

@@ -5,9 +5,9 @@ import fr.acinq.bitcoin.ScriptTree
 import fr.acinq.bitcoin.XonlyPublicKey
 
 class TaprootSpendingInfo(
-    internalKey: XonlyPublicKey,
-    merkleRoot: ByteVector32,
-    outputKey: XonlyPublicKey,
-    parity: Parity,
-    merkleScriptTree: ScriptTree,
+    val internalKey: XonlyPublicKey,
+    val outputKey: XonlyPublicKey,
+    val outputKeyParity: Parity,
+    val merkleRoot: ByteVector32,
+    val merkleScriptTree: ScriptTree,
 )

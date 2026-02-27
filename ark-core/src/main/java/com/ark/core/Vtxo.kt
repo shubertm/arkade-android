@@ -7,18 +7,19 @@ import com.ark.core.taproot.TaprootSpendingInfo
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
+import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.ScriptTree
 import fr.acinq.bitcoin.XonlyPublicKey
 
-class Vtxo(
-    serverPubKey: XonlyPublicKey,
-    ownerPubKey: XonlyPublicKey,
-    spendInfo: TaprootSpendingInfo,
-    tapScripts: List<ByteArray>,
-    address: Address,
-    exitDelay: Long,
-    exitDelaySeconds: Long,
-    network: Network,
+data class Vtxo(
+    val serverPubKey: XonlyPublicKey,
+    val ownerPubKey: XonlyPublicKey,
+    val spendInfo: TaprootSpendingInfo,
+    val tapScripts: List<ByteArray>,
+    val address: Address,
+    val exitDelay: Long,
+    val exitDelaySeconds: Long,
+    val network: Network,
 ) {
     companion object {
         fun build(
@@ -58,14 +59,17 @@ class Vtxo(
             val spendInfo =
                 TaprootSpendingInfo(
                     unSpendablePubKey,
-                    scriptTree.hash(),
                     outputKey,
                     Parity.fromBooleanIsOdd(isOdd),
+                    scriptTree.hash(),
                     scriptTree,
                 )
 
-            val address = Address()
-            val network = Network()
+            val scriptPubKey =
+                with(Script) {
+                    write(pay2tr(unSpendablePubKey, Crypto.TaprootTweak.KeyPathTweak))
+                }
+            val address = Address.fromScriptPubKey(scriptPubKey, network)
 
             return Vtxo(
                 serverPubKey,
