@@ -60,6 +60,8 @@ class VtxoTest {
         assertEquals(address.encode(), vtxo.address.encode())
 
         val (outputKey, isOdd) = unSpendablePubKey.outputKey(merkleRoot)
+        println(outputKey.value.toHex())
+        println(144.toHexString())
         val parity = Parity.fromBooleanIsOdd(isOdd)
         assertEquals(unSpendablePubKey, vtxo.spendingInfo.internalKey)
         assertEquals(outputKey, vtxo.spendingInfo.outputKey)
