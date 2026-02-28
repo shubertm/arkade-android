@@ -26,6 +26,7 @@ fun csvSigScript(
     lockTime: Long,
     ownerPubKey: XonlyPublicKey,
 ): ByteArray {
+    require(lockTime in 0..0xFFFFL) { "Invalid lock time" }
     val asm =
         listOf(
             OP_PUSHDATA(Script.encodeNumber(lockTime)),

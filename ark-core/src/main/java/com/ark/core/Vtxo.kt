@@ -48,20 +48,23 @@ data class Vtxo(
             exitDelay: Long,
             network: Network,
         ): Vtxo {
+            require(tapScripts.size == 2) { "Expects exactly 2 tap scripts: forfeit and exit" }
             val unSpendablePubKey = XonlyPublicKey(ByteVector32.fromValidHex(UNSPENDABLE_PUBKEY))
 
-            val forfeitLeaf = ScriptTree.Leaf(ByteVector(tapScripts[0]), 0)
-            val exitLeaf = ScriptTree.Leaf(ByteVector(tapScripts[1]), 0)
+            val (forfeitScript, exitScript) = tapScripts
+            val forfeitLeaf = ScriptTree.Leaf(ByteVector(forfeitScript), 0)
+            val exitLeaf = ScriptTree.Leaf(ByteVector(exitScript), 0)
             val scriptTree = ScriptTree.Branch(forfeitLeaf, exitLeaf)
+            val merkleRoot = scriptTree.hash()
 
-            val (outputKey, isOdd) = unSpendablePubKey.outputKey(Crypto.TaprootTweak.KeyPathTweak)
+            val (outputKey, isOdd) = unSpendablePubKey.outputKey(Crypto.TaprootTweak.ScriptPathTweak(merkleRoot))
 
             val spendInfo =
                 TaprootSpendingInfo(
                     unSpendablePubKey,
                     outputKey,
                     Parity.fromBooleanIsOdd(isOdd),
-                    scriptTree.hash(),
+                    merkleRoot,
                     scriptTree,
                 )
 
