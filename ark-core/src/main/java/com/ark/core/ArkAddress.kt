@@ -10,7 +10,7 @@ import fr.acinq.bitcoin.OP_RETURN
 import fr.acinq.bitcoin.Script
 
 /**
- * The `ArkAddress` class represents a Bech32m Arkade address.
+ * The `ArkAddress` class represents a [Bech32.Encoding.Bech32m] Arkade address.
  *
  * [hrp] (Human Readable Parts) is the prefix for the address representing a network identifier
  *  - `ark` (mainnet)
@@ -45,7 +45,7 @@ class ArkAddress(
     }
 
     /**
-     * Generate an Ark address as a Bech32m `String`
+     * Generate an Ark address as a [Bech32.Encoding.Bech32m] `String`
      * */
     fun encode(): String {
         var bytes = ByteArray(1)
@@ -56,7 +56,7 @@ class ArkAddress(
     }
 
     /**
-     * Creates a P2TR witness program from [vtxoTaprootPubKey]
+     * Creates a P2TR scriptpubkey from [vtxoTaprootPubKey]
      */
     fun toP2TRScriptPubkey(): ByteArray {
         val scriptPubkey =
@@ -80,9 +80,9 @@ class ArkAddress(
     companion object {
         /**
          * Creates a new [ArkAddress] from a [Network]
-         * @param network
-         * @param serverPubKey
-         * @param vtxoTaprootPubKey
+         * @param network is the [Network] where the address will be valid
+         * @param serverPubKey is the Arkade operator's x-only public key
+         * @param vtxoTaprootPubKey is the tweaked public key
          */
         fun create(
             network: Network,
@@ -100,7 +100,7 @@ class ArkAddress(
 
         /**
          * Creates a new [ArkAddress] from a Bech32m `String`
-         * @param address
+         * @param address is a [Bech32.Encoding.Bech32m] `String`
          * @throws IllegalArgumentException
          * * if the address encoding is not Bech32m
          * * if the address payload is not exactly 65 bytes.

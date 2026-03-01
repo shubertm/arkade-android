@@ -13,6 +13,28 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+/**
+ * The `Vtxo` class represents a `VTXO (Virtual Transaction Output)`, an Ark abstraction of the
+ * Bitcoin `UTXO (Unspent Transaction Output)`
+ *
+ * [serverPubKey] is the Arkade operator's x-only public key
+ *
+ * [ownerPubKey] is the Arkade user's x-only public key. This is the owner of the `VTXO`
+ *
+ * [spendingInfo] is the information required to spend this `VTXO`
+ *
+ * [tapScripts] is the list of scripts that can be used to spend this `VTXO`
+ *
+ * [address] is the address locking this `VTXO`
+ *
+ * [exitDelay] (intervals) is the amount of time the owner waits for unilateral exit after transaction on chain confirmation
+ *
+ * `intervals = (seconds / 512)`
+ *
+ * [exitDelaySeconds] is the [exitDelay] in seconds
+ *
+ * [network] is the [Network] where this `VTXO` exists and is valid
+ */
 data class Vtxo(
     val serverPubKey: XonlyPublicKey,
     val ownerPubKey: XonlyPublicKey,
@@ -23,8 +45,14 @@ data class Vtxo(
     val exitDelaySeconds: Long,
     val network: Network,
 ) {
+    /**
+     * @return the scriptpukey locking this `VTXO`
+     */
     fun getScriptPubKey(): ByteArray = address.toScriptPubKey()
 
+    /**
+     * @return an [ArkAddress] that locks this `VTXO`
+     */
     fun getArkAddress(): ArkAddress =
         ArkAddress.create(
             network,
@@ -32,6 +60,11 @@ data class Vtxo(
             spendingInfo.outputKey.value.toByteArray(),
         )
 
+    /**
+     * @param script is the script to use for spending this `VTXO`
+     * @return the control block for the [script], required to spend using the [script]
+     * @throws IllegalArgumentException if the provided script is not found in the [ScriptTree]
+     */
     fun getControlBlock(script: ByteArray): ByteArray {
         val spendingLeaf =
             spendingInfo.merkleScriptTree.findScript(ByteVector32(script))
@@ -45,18 +78,29 @@ data class Vtxo(
             ).toByteArray()
     }
 
+    /**
+     * @return the script and control block for spending this `UTXO` collaboratively encapsulated in [ScriptSpendingPath]
+     */
     fun getForfeitSpendingPath(): ScriptSpendingPath {
         val forfeitScript = tapScripts[0]
         val controlBlock = getControlBlock(forfeitScript)
         return ScriptSpendingPath(forfeitScript, controlBlock)
     }
 
+    /**
+     * @return the script and control block for spending this `UTXO` unilaterally encapsulated in [ScriptSpendingPath]
+     */
     fun getExitSpendingPath(): ScriptSpendingPath {
         val exitScript = tapScripts[1]
         val controlBlock = getControlBlock(exitScript)
         return ScriptSpendingPath(exitScript, controlBlock)
     }
 
+    /**
+     * @param now is the current system time
+     * @param blockConfirmTime is the time at which this `VTXO` was confirmed on-chain
+     * @return whether this `VTXO`'s unilateral [exitDelay] has expired or not
+     */
     fun canBeClaimedUnilaterally(
         now: Duration,
         blockConfirmTime: Duration,
@@ -66,6 +110,17 @@ data class Vtxo(
     }
 
     companion object {
+        /**
+         * Creates a `VTXO`
+         * @param serverPubKey is the Arkade operator's x-only public key
+         * @param ownerPubKey is the Arkade user's x-only public key. This is the owner of the `VTXO`
+         * @param exitDelay (intervals) is the amount of time the owner waits for unilateral exit
+         * after transaction on chain confirmation
+         *
+         * `intervals = (seconds / 512)`
+         *
+         * @param network is the [Network] where this `VTXO` exists and is valid
+         */
         fun build(
             serverPubKey: XonlyPublicKey,
             ownerPubKey: XonlyPublicKey,
@@ -85,6 +140,19 @@ data class Vtxo(
             )
         }
 
+
+        /**
+         * Creates a `VTXO` from custom scripts
+         * @param serverPubKey is the Arkade operator's x-only public key
+         * @param ownerPubKey is the Arkade user's x-only public key. This is the owner of the `VTXO`
+         * @param tapScripts is the list of scripts that can be used to spend this `VTXO`
+         * @param exitDelay (intervals) is the amount of time the owner waits for unilateral exit
+         * after transaction on chain confirmation
+         *
+         * `intervals = (seconds / 512)`
+         *
+         * @param network is the [Network] where this `VTXO` exists and is valid
+         */
         fun fromScripts(
             serverPubKey: XonlyPublicKey,
             ownerPubKey: XonlyPublicKey,
@@ -132,6 +200,9 @@ data class Vtxo(
     }
 }
 
+/**
+ * This is an encapsulation of a script to use for spending a `VTXO` and it's control block
+ */
 data class ScriptSpendingPath(
     val script: ByteArray,
     val control: ByteArray,

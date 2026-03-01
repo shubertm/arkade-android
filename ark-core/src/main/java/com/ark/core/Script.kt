@@ -8,6 +8,11 @@ import fr.acinq.bitcoin.OP_PUSHDATA
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.XonlyPublicKey
 
+/**
+ * @param serverPubKey is the Arkade operator's x-only public key
+ * @param ownerPubKey is the `VTXO` owner's x-only public key
+ * @return a multisig script for collaborative exit
+ */
 fun multisigScript(
     serverPubKey: XonlyPublicKey,
     ownerPubKey: XonlyPublicKey,
@@ -22,6 +27,11 @@ fun multisigScript(
     return Script.write(asm)
 }
 
+/**
+ * @param lockTime is the wait time for the exit after on-chain confirmation
+ * @param ownerPubKey is the x-only public key for the `VTXO` owner
+ * @return a `CSV` script for unilateral exit
+ */
 fun csvSigScript(
     lockTime: Long,
     ownerPubKey: XonlyPublicKey,

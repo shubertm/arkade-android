@@ -5,6 +5,22 @@ import fr.acinq.bitcoin.OP_1
 import fr.acinq.bitcoin.OP_PUSHDATA
 import fr.acinq.bitcoin.Script
 
+/**
+ * The `Address` represents a [Bech32.Encoding.Bech32m] of an on-chain Bitcoin address
+ *
+ * [hrp] (Human Readable Parts) is the prefix for the address representing a network identifier
+ * * `bc` (mainnet)
+ * * `tb` (testnet, signet)
+ * * `bcrt` (regtest)
+ *
+ * [witnessVersion] is the version of the witness program locking a UTXO to this address
+ *
+ * [witnessProgram] is the witness program for locking a UTXO to this address
+ *
+ * @throws IllegalArgumentException
+ * * if the provided [witnessVersion] is not supported
+ * * if the length of the provided witness program is not exactly 32 bytes
+ */
 class Address(
     val hrp: Hrp,
     val witnessVersion: WitnessVersion = WitnessVersion.TAPROOT,
@@ -18,8 +34,14 @@ class Address(
         require(witnessProgramSize == 32) { "Invalid witness program length, expected 32 bytes, but got $witnessProgramSize" }
     }
 
+    /**
+     * Generates a Bitcoin on-chain address as a [Bech32.Encoding.Bech32m] `String`
+     */
     fun encode(): String = Bech32.encodeWitnessAddress(hrp.prefix, witnessVersion.toByte(), witnessProgram)
 
+    /**
+     * Creates a P2TR scriptpubkey from the [witnessProgram]
+     */
     fun toScriptPubKey(): ByteArray {
         val asm =
             listOf(
@@ -31,8 +53,20 @@ class Address(
     }
 
     companion object {
+        /**
+         * Creates a new [Address] from a [Bech32.Encoding.Bech32m] `String`
+         * @param address is a [Bech32.Encoding.Bech32m] `String`
+         * @throws IllegalArgumentException
+         * * if the witness program length not exactly 32 bytes
+         * * if the witness version is no supported
+         * * if the [Hrp] prefix is invalid
+         */
         fun decode(address: String): Address {
             val (prefix, version, witnessProgram) = Bech32.decodeWitnessAddress(address)
+            val bytesSize = witnessProgram.size
+            require(bytesSize == 32) { "Invalid witness program length: $bytesSize" }
+            require(version == WitnessVersion.TAPROOT.toByte() || version == WitnessVersion.SEGWIT.toByte()) { "Unsupported address version: $version" }
+
             val hrp = Hrp.fromString(prefix)
             return Address(
                 hrp,
@@ -41,12 +75,17 @@ class Address(
             )
         }
 
+        /**
+         * Creates a Bitcoin on-chain [Address] from a scriptpubkey
+         * @param scriptPubKey is the script that can lock a UTXO to the [Address] it creates
+         * @param network is the Bitcoin [Network] where the scriptpubkey and the [Address] are valid
+         */
         fun fromScriptPubKey(
-            script: ByteArray,
+            scriptPubKey: ByteArray,
             network: Network,
         ): Address {
-            val witnessVersionByte = script[0]
-            val witnessProgram = script.copyOfRange(2, 34)
+            val witnessVersionByte = scriptPubKey[0]
+            val witnessProgram = scriptPubKey.copyOfRange(2, 34)
             val hrp = Hrp.fromNetwork(network)
             return Address(
                 hrp,
