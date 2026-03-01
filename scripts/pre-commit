@@ -20,7 +20,7 @@ fi
 
 status=$?
 if [ "$status" = 0 ]; then
-  printf "\nCode style is good\nAll unit tests passed"
+  printf "\nCode style is good\nAll unit tests passed\n"
 else
   echo "Some release unit tests are failing!"
   exit 1
