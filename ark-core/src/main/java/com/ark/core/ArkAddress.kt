@@ -1,5 +1,8 @@
 package com.ark.core
 
+import com.ark.core.ArkHrp.Companion.fromNetwork
+import com.ark.core.ArkHrp.Companion.fromString
+import com.ark.core.bitcoin.Network
 import fr.acinq.bitcoin.Bech32
 import fr.acinq.bitcoin.OP_1
 import fr.acinq.bitcoin.OP_PUSHDATA
@@ -26,7 +29,7 @@ import fr.acinq.bitcoin.Script
  * * if [serverPubKey] or [vtxoTaprootPubKey] provided are not exactly 32 bytes
  */
 class ArkAddress(
-    val hrp: String,
+    val hrp: ArkHrp,
     val version: Int,
     val serverPubKey: ByteArray,
     val vtxoTaprootPubKey: ByteArray,
@@ -48,7 +51,7 @@ class ArkAddress(
         var bytes = ByteArray(1)
         bytes[0] = version.toByte()
         bytes = bytes + serverPubKey + vtxoTaprootPubKey
-        val address = Bech32.encodeBytes(hrp, bytes, Bech32.Encoding.Bech32m)
+        val address = Bech32.encodeBytes(hrp.prefix, bytes, Bech32.Encoding.Bech32m)
         return address
     }
 
@@ -76,6 +79,26 @@ class ArkAddress(
 
     companion object {
         /**
+         * Creates a new [ArkAddress] from a [Network]
+         * @param network
+         * @param serverPubKey
+         * @param vtxoTaprootPubKey
+         */
+        fun create(
+            network: Network,
+            serverPubKey: ByteArray,
+            vtxoTaprootPubKey: ByteArray,
+        ): ArkAddress {
+            val hrp = fromNetwork(network)
+            return ArkAddress(
+                hrp,
+                0,
+                serverPubKey,
+                vtxoTaprootPubKey,
+            )
+        }
+
+        /**
          * Creates a new [ArkAddress] from a Bech32m `String`
          * @param address
          * @throws IllegalArgumentException
@@ -94,11 +117,36 @@ class ArkAddress(
             val serverPubKey = bytes.copyOfRange(1, 33)
             val vtxoTaprootPubKey = bytes.copyOfRange(33, 65)
             return ArkAddress(
-                hrp,
+                fromString(hrp),
                 version,
                 serverPubKey,
                 vtxoTaprootPubKey,
             )
         }
+    }
+}
+
+enum class ArkHrp(
+    val prefix: String,
+) {
+    MAINNET("ark"),
+    TESTNET("tark"),
+    ;
+
+    companion object {
+        fun fromNetwork(network: Network): ArkHrp =
+            when (network) {
+                Network.MAINNET -> MAINNET
+                else -> TESTNET
+            }
+
+        fun fromString(prefix: String): ArkHrp =
+            when (prefix) {
+                MAINNET.prefix -> MAINNET
+                TESTNET.prefix -> TESTNET
+                else -> {
+                    throw IllegalArgumentException("Invalid ark address prefix")
+                }
+            }
     }
 }

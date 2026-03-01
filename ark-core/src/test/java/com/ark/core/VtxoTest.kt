@@ -50,6 +50,8 @@ class VtxoTest {
         assertEquals(144L * 512, vtxo.exitDelaySeconds)
         assertEquals(2, vtxo.tapScripts.size)
 
+        assertEquals(scriptPubKey.toHexString(), vtxo.getScriptPubKey().toHexString())
+
         val (forfeit, exit) = vtxo.tapScripts
         assertEquals(forfeitScript.toHexString(), forfeit.toHexString())
         assertEquals(exitScript.toHexString(), exit.toHexString())
@@ -66,6 +68,12 @@ class VtxoTest {
         assertEquals(parity, vtxo.spendingInfo.outputKeyParity)
         assertEquals(merkleRoot, vtxo.spendingInfo.merkleRoot)
         assertEquals(scriptTree, vtxo.spendingInfo.merkleScriptTree)
+
+        val arkAddress = vtxo.getArkAddress()
+        assertEquals(ArkHrp.MAINNET, arkAddress.hrp)
+        assertEquals(serverPubKey.value.toHex(), arkAddress.serverPubKey.toHexString())
+        assertEquals(outputKey.value.toHex(), arkAddress.vtxoTaprootPubKey.toHexString())
+        assertEquals(scriptPubKey.toHexString(), arkAddress.toP2TRScriptPubkey().toHexString())
     }
 
     @Test

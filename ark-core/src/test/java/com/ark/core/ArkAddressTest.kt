@@ -16,7 +16,7 @@ class ArkAddressTest {
 
         val decoded = ArkAddress.decode(address)
         val hrp = decoded.hrp
-        assertEquals("tark", hrp)
+        assertEquals("tark", hrp.prefix)
 
         val version = decoded.version
         assertEquals(0, version)
@@ -80,7 +80,7 @@ class ArkAddressTest {
                 "6z3rjtf4f2rvw82n9ns8c73mu"
         val (hrp, bytes, encoding) = Bech32.decodeBytes(address)
         ArkAddress(
-            hrp,
+            ArkHrp.fromString(hrp),
             bytes[0].toInt(),
             bytes.copyOfRange(1, 49),
             bytes.copyOfRange(49, 97),
@@ -95,7 +95,7 @@ class ArkAddressTest {
                 "6z3rjtf4f2rvw82n9ns8c73mu"
         val (hrp, bytes, encoding) = Bech32.decodeBytes(address)
         ArkAddress(
-            hrp,
+            ArkHrp.fromString(hrp),
             bytes[0].toInt(),
             bytes.copyOfRange(1, 33),
             bytes.copyOfRange(33, 97),

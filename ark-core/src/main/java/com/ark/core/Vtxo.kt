@@ -9,6 +9,9 @@ import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.ScriptTree
 import fr.acinq.bitcoin.XonlyPublicKey
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 data class Vtxo(
     val serverPubKey: XonlyPublicKey,
@@ -20,6 +23,48 @@ data class Vtxo(
     val exitDelaySeconds: Long,
     val network: Network,
 ) {
+    fun getScriptPubKey(): ByteArray = address.toScriptPubKey()
+
+    fun getArkAddress(): ArkAddress =
+        ArkAddress.create(
+            network,
+            serverPubKey.value.toByteArray(),
+            spendingInfo.outputKey.value.toByteArray(),
+        )
+
+    fun getControlBlock(script: ByteArray): ByteArray {
+        val spendingLeaf =
+            spendingInfo.merkleScriptTree.findScript(ByteVector32(script))
+                ?: throw IllegalArgumentException("Invalid leaf script")
+
+        return Script.ControlBlock
+            .build(
+                spendingInfo.internalKey,
+                spendingInfo.merkleScriptTree,
+                spendingLeaf,
+            ).toByteArray()
+    }
+
+    fun getForfeitSpendingPath(): ScriptSpendingPath {
+        val forfeitScript = tapScripts[0]
+        val controlBlock = getControlBlock(forfeitScript)
+        return ScriptSpendingPath(forfeitScript, controlBlock)
+    }
+
+    fun getExitSpendingPath(): ScriptSpendingPath {
+        val exitScript = tapScripts[1]
+        val controlBlock = getControlBlock(exitScript)
+        return ScriptSpendingPath(exitScript, controlBlock)
+    }
+
+    fun canBeClaimedUnilaterally(
+        now: Duration,
+        blockConfirmTime: Duration,
+    ): Boolean {
+        val exitTime = blockConfirmTime + exitDelaySeconds.toDuration(DurationUnit.SECONDS)
+        return now > exitTime
+    }
+
     companion object {
         fun build(
             serverPubKey: XonlyPublicKey,
@@ -58,7 +103,7 @@ data class Vtxo(
 
             val (outputKey, isOdd) = unSpendablePubKey.outputKey(merkleRoot)
 
-            val spendInfo =
+            val spendingInfo =
                 TaprootSpendingInfo(
                     unSpendablePubKey,
                     outputKey,
@@ -76,7 +121,7 @@ data class Vtxo(
             return Vtxo(
                 serverPubKey,
                 ownerPubKey,
-                spendInfo,
+                spendingInfo,
                 tapScripts,
                 address,
                 exitDelay,
@@ -84,5 +129,28 @@ data class Vtxo(
                 network,
             )
         }
+    }
+}
+
+data class ScriptSpendingPath(
+    val script: ByteArray,
+    val control: ByteArray,
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ScriptSpendingPath
+
+        if (!script.contentEquals(other.script)) return false
+        if (!control.contentEquals(other.control)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = script.contentHashCode()
+        result = 31 * result + control.contentHashCode()
+        return result
     }
 }
