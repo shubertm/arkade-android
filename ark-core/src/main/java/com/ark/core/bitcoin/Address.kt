@@ -65,7 +65,9 @@ class Address(
             val (prefix, version, witnessProgram) = Bech32.decodeWitnessAddress(address)
             val bytesSize = witnessProgram.size
             require(bytesSize == 32) { "Invalid witness program length: $bytesSize" }
-            require(version == WitnessVersion.TAPROOT.toByte() || version == WitnessVersion.SEGWIT.toByte()) { "Unsupported address version: $version" }
+            require(
+                version == WitnessVersion.TAPROOT.toByte() || version == WitnessVersion.SEGWIT.toByte(),
+            ) { "Unsupported address version: $version" }
 
             val hrp = Hrp.fromString(prefix)
             return Address(

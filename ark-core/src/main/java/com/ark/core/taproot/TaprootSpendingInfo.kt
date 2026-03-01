@@ -5,7 +5,7 @@ import fr.acinq.bitcoin.ScriptTree
 import fr.acinq.bitcoin.XonlyPublicKey
 
 /**
- * The `TaprootSpendingInfo` class carries the information required to spend the VTXO
+ * The `TaprootSpendingInfo` class carries the information required to spend a VTXO
  *
  * [internalKey] is the untweaked x-only public key for locking keypath spend
  *
@@ -13,7 +13,7 @@ import fr.acinq.bitcoin.XonlyPublicKey
  *
  * [outputKey] is the tweaked x-only public key of [internalKey]
  *
- * [outputKeyParity] is the [Parity] of [outputKey]
+ * [outputKeyParity] is the [Parity] of the [outputKey]
  *
  * [merkleRoot] is the hash of the [ScriptTree]
  *

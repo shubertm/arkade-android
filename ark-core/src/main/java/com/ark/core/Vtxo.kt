@@ -140,7 +140,6 @@ data class Vtxo(
             )
         }
 
-
         /**
          * Creates a `VTXO` from custom scripts
          * @param serverPubKey is the Arkade operator's x-only public key
