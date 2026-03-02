@@ -15,10 +15,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
-          cache: gradle
 
-      - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@v3
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Build Debug AAR
         run: ./gradlew ark-core:assembleDebug
@@ -50,6 +49,9 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
       - name: Run linter
         run: ./gradlew lint
 
@@ -69,6 +71,9 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Kotlin linter
         run: ./gradlew ktlintCheck
