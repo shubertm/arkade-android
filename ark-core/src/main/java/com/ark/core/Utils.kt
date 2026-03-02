@@ -1,0 +1,7 @@
+package com.ark.core
+
+/**
+ * The unspendable x-only public key, nobody knows the private key. Any funds locked to this public key cannot be spent,
+ * aka `NUMS`. In Taproot it is used to lock key path spending and force script path spending.
+ */
+const val UNSPENDABLE_PUBKEY = "50929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0"

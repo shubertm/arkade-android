@@ -1,5 +1,8 @@
 package com.ark.core
 
+import com.ark.core.ArkHrp.Companion.fromNetwork
+import com.ark.core.ArkHrp.Companion.fromString
+import com.ark.core.bitcoin.Network
 import fr.acinq.bitcoin.Bech32
 import fr.acinq.bitcoin.OP_1
 import fr.acinq.bitcoin.OP_PUSHDATA
@@ -7,7 +10,7 @@ import fr.acinq.bitcoin.OP_RETURN
 import fr.acinq.bitcoin.Script
 
 /**
- * The `ArkAddress` class represents a Bech32m Arkade address.
+ * The `ArkAddress` class represents a [Bech32.Encoding.Bech32m] Arkade address.
  *
  * [hrp] (Human Readable Parts) is the prefix for the address representing a network identifier
  *  - `ark` (mainnet)
@@ -26,7 +29,7 @@ import fr.acinq.bitcoin.Script
  * * if [serverPubKey] or [vtxoTaprootPubKey] provided are not exactly 32 bytes
  */
 class ArkAddress(
-    val hrp: String,
+    val hrp: ArkHrp,
     val version: Int,
     val serverPubKey: ByteArray,
     val vtxoTaprootPubKey: ByteArray,
@@ -42,18 +45,18 @@ class ArkAddress(
     }
 
     /**
-     * Generate an Ark address as a Bech32m `String`
+     * Generate an Ark address as a [Bech32.Encoding.Bech32m] `String`
      * */
     fun encode(): String {
         var bytes = ByteArray(1)
         bytes[0] = version.toByte()
         bytes = bytes + serverPubKey + vtxoTaprootPubKey
-        val address = Bech32.encodeBytes(hrp, bytes, Bech32.Encoding.Bech32m)
+        val address = Bech32.encodeBytes(hrp.prefix, bytes, Bech32.Encoding.Bech32m)
         return address
     }
 
     /**
-     * Creates a P2TR witness program from [vtxoTaprootPubKey]
+     * Creates a P2TR scriptpubkey from [vtxoTaprootPubKey]
      */
     fun toP2TRScriptPubkey(): ByteArray {
         val scriptPubkey =
@@ -76,8 +79,28 @@ class ArkAddress(
 
     companion object {
         /**
-         * Creates a new `ArkAddress` from a Bech32m `String`
-         * @param address
+         * Creates a new [ArkAddress] from a [Network]
+         * @param network is the [Network] where the address will be valid
+         * @param serverPubKey is the Arkade operator's x-only public key
+         * @param vtxoTaprootPubKey is the tweaked public key
+         */
+        fun create(
+            network: Network,
+            serverPubKey: ByteArray,
+            vtxoTaprootPubKey: ByteArray,
+        ): ArkAddress {
+            val hrp = fromNetwork(network)
+            return ArkAddress(
+                hrp,
+                0,
+                serverPubKey,
+                vtxoTaprootPubKey,
+            )
+        }
+
+        /**
+         * Creates a new [ArkAddress] from a Bech32m `String`
+         * @param address is a [Bech32.Encoding.Bech32m] `String`
          * @throws IllegalArgumentException
          * * if the address encoding is not Bech32m
          * * if the address payload is not exactly 65 bytes.
@@ -94,11 +117,36 @@ class ArkAddress(
             val serverPubKey = bytes.copyOfRange(1, 33)
             val vtxoTaprootPubKey = bytes.copyOfRange(33, 65)
             return ArkAddress(
-                hrp,
+                fromString(hrp),
                 version,
                 serverPubKey,
                 vtxoTaprootPubKey,
             )
         }
+    }
+}
+
+enum class ArkHrp(
+    val prefix: String,
+) {
+    MAINNET("ark"),
+    TESTNET("tark"),
+    ;
+
+    companion object {
+        fun fromNetwork(network: Network): ArkHrp =
+            when (network) {
+                Network.MAINNET -> MAINNET
+                else -> TESTNET
+            }
+
+        fun fromString(prefix: String): ArkHrp =
+            when (prefix) {
+                MAINNET.prefix -> MAINNET
+                TESTNET.prefix -> TESTNET
+                else -> {
+                    throw IllegalArgumentException("Invalid ark address prefix")
+                }
+            }
     }
 }
