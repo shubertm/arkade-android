@@ -45,6 +45,10 @@ data class Vtxo(
     val exitDelaySeconds: Long,
     val network: Network,
 ) {
+    init {
+        require(tapScripts.size == 2) { "Expects exactly 2 tap scripts: forfeit and exit" }
+    }
+
     /**
      * @return the scriptpukey locking this `VTXO`
      */
@@ -82,18 +86,18 @@ data class Vtxo(
      * @return the script and control block for spending this `UTXO` collaboratively encapsulated in [ScriptSpendingPath]
      */
     fun getForfeitSpendingPath(): ScriptSpendingPath {
-        val forfeitScript = tapScripts[0]
+        val forfeitScript = tapScripts[0].copyOf()
         val controlBlock = getControlBlock(forfeitScript)
-        return ScriptSpendingPath(forfeitScript, controlBlock)
+        return ScriptSpendingPath(forfeitScript, controlBlock.copyOf())
     }
 
     /**
      * @return the script and control block for spending this `UTXO` unilaterally encapsulated in [ScriptSpendingPath]
      */
     fun getExitSpendingPath(): ScriptSpendingPath {
-        val exitScript = tapScripts[1]
+        val exitScript = tapScripts[1].copyOf()
         val controlBlock = getControlBlock(exitScript)
-        return ScriptSpendingPath(exitScript, controlBlock)
+        return ScriptSpendingPath(exitScript, controlBlock.copyOf())
     }
 
     /**
@@ -159,6 +163,7 @@ data class Vtxo(
             exitDelay: Long,
             network: Network,
         ): Vtxo {
+            require(exitDelay in 0..0xFFFFL) { "Exit delay time is out of range" }
             require(tapScripts.size == 2) { "Expects exactly 2 tap scripts: forfeit and exit" }
             val unSpendablePubKey = XonlyPublicKey(ByteVector32.fromValidHex(UNSPENDABLE_PUBKEY))
 
@@ -185,14 +190,16 @@ data class Vtxo(
                 }
             val address = Address.fromScriptPubKey(scriptPubKey, network)
 
+            val exitDelaySeconds = Math.multiplyExact(exitDelay, 512)
+
             return Vtxo(
                 serverPubKey,
                 ownerPubKey,
                 spendingInfo,
-                tapScripts,
+                tapScripts.map { it.copyOf() },
                 address,
                 exitDelay,
-                exitDelay * 512,
+                exitDelaySeconds,
                 network,
             )
         }
