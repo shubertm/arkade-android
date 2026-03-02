@@ -1,6 +1,7 @@
 package com.ark.core.bitcoin
 
 import fr.acinq.bitcoin.Bech32
+import fr.acinq.bitcoin.OP_0
 import fr.acinq.bitcoin.OP_1
 import fr.acinq.bitcoin.OP_PUSHDATA
 import fr.acinq.bitcoin.Script
@@ -45,7 +46,10 @@ class Address(
     fun toScriptPubKey(): ByteArray {
         val asm =
             listOf(
-                OP_1,
+                when (witnessVersion) {
+                    WitnessVersion.SEGWIT -> OP_0
+                    WitnessVersion.TAPROOT -> OP_1
+                },
                 OP_PUSHDATA(witnessProgram),
             )
         val scriptPubKey = Script.write(asm)
@@ -86,6 +90,18 @@ class Address(
             scriptPubKey: ByteArray,
             network: Network,
         ): Address {
+            val scriptPubKeySize = scriptPubKey.size
+            require(scriptPubKeySize == 34) {
+                "Invalid scriptPubKey length, expected 34 bytes but got $scriptPubKeySize"
+            }
+            val witnessProgramPushByte = scriptPubKey[1]
+            require(witnessProgramPushByte == 0x20.toByte()) {
+                "Invalid witness program push length, expected 0x20 but got $witnessProgramPushByte"
+            }
+            val witnessVersion = WitnessVersion.fromByte(scriptPubKey[0])
+            require(witnessVersion == WitnessVersion.SEGWIT || witnessVersion == WitnessVersion.TAPROOT) {
+                "Unsupported witness version"
+            }
             val witnessVersionByte = scriptPubKey[0]
             val witnessProgram = scriptPubKey.copyOfRange(2, 34)
             val hrp = Hrp.fromNetwork(network)

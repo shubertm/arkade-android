@@ -44,7 +44,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.bitcoin.kmp)
     implementation(libs.secp256k1.kmp.jni.android)
-    implementation(libs.secp256k1.kmp.jni.jvm)
+    testImplementation(libs.secp256k1.kmp.jni.jvm)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

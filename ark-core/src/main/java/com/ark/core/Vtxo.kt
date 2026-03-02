@@ -67,7 +67,7 @@ data class Vtxo(
      */
     fun getControlBlock(script: ByteArray): ByteArray {
         val spendingLeaf =
-            spendingInfo.merkleScriptTree.findScript(ByteVector32(script))
+            spendingInfo.merkleScriptTree.findScript(ByteVector(script))
                 ?: throw IllegalArgumentException("Invalid leaf script")
 
         return Script.ControlBlock
@@ -106,7 +106,7 @@ data class Vtxo(
         blockConfirmTime: Duration,
     ): Boolean {
         val exitTime = blockConfirmTime + exitDelaySeconds.toDuration(DurationUnit.SECONDS)
-        return now > exitTime
+        return now >= exitTime
     }
 
     companion object {
