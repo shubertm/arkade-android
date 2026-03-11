@@ -15,34 +15,34 @@ data class BoardingOutput(
     val ownerPubKey: XonlyPublicKey,
     val spendingInfo: TaprootSpendingInfo,
     val address: Address,
-    val exitDelay: Long
+    val exitDelay: Long,
 ) {
-
-
     companion object {
         fun create(
             severPubKey: XonlyPublicKey,
             ownerPubKey: XonlyPublicKey,
             exitDelay: Long,
-            network: Network
+            network: Network,
         ): BoardingOutput {
             val multisigScript = multisigScript(severPubKey, ownerPubKey)
             val csvScript = csvSigScript(exitDelay, ownerPubKey)
 
-            val merkleTree = ScriptTree.Branch(
-                ScriptTree.Leaf(ByteVector(multisigScript), 0),
-                ScriptTree.Leaf(ByteVector(csvScript), 0),
-            )
+            val merkleTree =
+                ScriptTree.Branch(
+                    ScriptTree.Leaf(ByteVector(multisigScript), 0),
+                    ScriptTree.Leaf(ByteVector(csvScript), 0),
+                )
             val merkleRoot = merkleTree.hash()
 
             val internalKey = PublicKey.fromHex(UNSPENDABLE_PUBKEY).xOnly()
             val (outputKey, isOdd) = internalKey.outputKey(merkleTree)
-            val spendingInfo = TaprootSpendingInfo(
-                internalKey,
-                outputKey,
-                Parity.fromBooleanIsOdd(isOdd),
-                merkleRoot,
-                merkleTree
+            val spendingInfo =
+                TaprootSpendingInfo(
+                    internalKey,
+                    outputKey,
+                    Parity.fromBooleanIsOdd(isOdd),
+                    merkleRoot,
+                    merkleTree,
                 )
 
             val scriptPubKey =
@@ -56,7 +56,7 @@ data class BoardingOutput(
                 ownerPubKey,
                 spendingInfo,
                 address,
-                exitDelay
+                exitDelay,
             )
         }
     }
