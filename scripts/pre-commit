@@ -4,8 +4,18 @@
 
 status=$?
 if [ "$status" != 0 ]; then
-  echo "ktlintCheck failed, format code again manually!"
+  ./gradlew ktlintFormat
+  git update-index --again
+  echo "Formatted Kotlin code, commit again!"
   exit 1
+fi
+
+STASH_COUNT_BEFORE=$(git stash list 2>/dev/null | wc -l | tr -d '[:space:]')
+git stash --quiet --keep-index --include-untracked
+STASH_COUNT_AFTER=$(git stash list 2>/dev/null | wc -l | tr -d '[:space:]')
+
+if [ "$STASH_COUNT_AFTER" -gt "$STASH_COUNT_BEFORE" ]; then
+  trap "git stash pop --quiet" EXIT
 fi
 
 ./gradlew testDebugUnitTest
