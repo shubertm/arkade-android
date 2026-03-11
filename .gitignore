@@ -9,4 +9,4 @@
 .cxx
 local.properties
 .kotlin
-ME.md
+internal_*.md
