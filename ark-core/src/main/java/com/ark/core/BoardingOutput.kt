@@ -14,6 +14,15 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+/**
+ * The `BoardingInput` class represents a `UTXO` that can be used to create a `VTXO`
+ * during the boarding process.
+ * [serverPubKey] is the Arkade operator's x-only public key
+ * [ownerPubKey] is the Arkade user's x-only public key. This is the owner of the `UTXO`
+ * [spendingInfo] is the information required to spend this `UTXO`
+ * [address] is the address locking this `UTXO`
+ * [exitDelay] (intervals) is the amount of time the owner waits for unilateral exit after transaction on chain confirmation
+ */
 data class BoardingOutput(
     val serverPubKey: XonlyPublicKey,
     val ownerPubKey: XonlyPublicKey,
@@ -29,8 +38,16 @@ data class BoardingOutput(
         tapScripts = listOf(forfeitScript, exitScript)
     }
 
+    /**
+     * @return the scriptpukey locking this `UTXO`
+     */
     fun getScriptPubKey() = address.toScriptPubKey()
 
+    /**
+     * @param network is the [Network] where this `UTXO` exists and is valid
+     * @param serverPubKey is the Arkade operator's x-only public key
+     * @return an [ArkAddress] that locks a `VTXO` created from this `UTXO`
+     */
     fun getArkAddress(
         network: Network,
         serverPubKey: XonlyPublicKey,
@@ -40,6 +57,11 @@ data class BoardingOutput(
         spendingInfo.outputKey.value.toByteArray(),
     )
 
+    /**
+     * @param script is the script to use for spending this `UTXO`
+     * @return the control block for the [script], required to spend using the [script]
+     * @throws IllegalArgumentException if the provided script is not found in the [ScriptTree]
+     */
     fun getControlBlock(script: ByteArray): ByteArray {
         val spendingLeaf =
             spendingInfo.merkleScriptTree.findScript((ByteVector(script)))
@@ -53,20 +75,34 @@ data class BoardingOutput(
             ).toByteArray()
     }
 
+    /**
+     * @return the script and control block for spending this `UTXO` collaboratively encapsulated in [ScriptSpendingPath]
+     */
     fun getForfeitSpendingInfo(): ScriptSpendingPath {
         val script = tapScripts[0]
         val controlBlock = getControlBlock(script)
         return ScriptSpendingPath(script, controlBlock)
     }
 
+    /**
+     * @return the script and control block for spending this `UTXO` unilaterally encapsulated in [ScriptSpendingPath]
+     */
     fun getExitSpendingInfo(): ScriptSpendingPath {
         val script = tapScripts[1]
         val controlBlock = getControlBlock(script)
         return ScriptSpendingPath(script, controlBlock)
     }
 
+    /**
+     * @return the list of tap scripts that can be used to spend this `UTXO`
+     */
     fun getTapScripts(): List<ByteArray> = tapScripts
 
+    /**
+     * @param now is the current system time
+     * @param blockConfirmTime is the time at which this `UTXO` was confirmed on-chain
+     * @return whether this `UTXO`'s unilateral [exitDelay] has expired or not
+     */
     fun canBeClaimedUnilaterally(
         now: Duration,
         blockConfirmTime: Duration,
@@ -77,6 +113,18 @@ data class BoardingOutput(
     }
 
     companion object {
+        /**
+         * Creates a `BoardingInput`
+         * @param severPubKey is the Arkade operator's x-only public key
+         * @param ownerPubKey is the Arkade user's x-only public key. This is the owner of the `UTXO`
+         * @param exitDelay (intervals) is the amount of time the owner waits for unilateral exit
+         * after transaction on chain confirmation
+         *
+         * `intervals = (seconds / 512)`
+         *
+         * @param network is the [Network] where this `UTXO` exists and is valid
+         * @return a `BoardingInput` that can be used to create a `VTXO`
+         */
         fun create(
             severPubKey: XonlyPublicKey,
             ownerPubKey: XonlyPublicKey,
