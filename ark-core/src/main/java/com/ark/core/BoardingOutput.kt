@@ -1,16 +1,20 @@
 package com.ark.core
 
 import com.ark.core.bitcoin.Address
+import com.ark.core.bitcoin.Coin
 import com.ark.core.bitcoin.Network
+import com.ark.core.bitcoin.Utxo
 import com.ark.core.taproot.Parity
 import com.ark.core.taproot.TaprootSpendingInfo
 import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.ScriptTree
 import fr.acinq.bitcoin.XonlyPublicKey
 import java.lang.Math.multiplyExact
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -165,6 +169,67 @@ data class BoardingOutput(
                 address,
                 exitDelay,
             )
+        }
+    }
+}
+
+data class BoardingOutpoints(
+    val spendable: List<Triple<OutPoint, Coin, BoardingOutput>>,
+    val expired: List<Triple<OutPoint, Coin, BoardingOutput>>,
+    val pending: List<Triple<OutPoint, Coin, BoardingOutput>>,
+    val spent: List<Pair<OutPoint, Coin>>,
+) {
+    fun spendableBalance() = spendable.sumOf { it.second.amount.toDouble() }
+
+    fun expiredBalance() = expired.sumOf { it.second.amount.toDouble() }
+
+    fun pendingBalance() = pending.sumOf { it.second.amount.toDouble() }
+
+    companion object {
+        fun fromBoardingOutputs(
+            boardingOutputs: List<BoardingOutput>,
+            getOnChainUtxos: (Address) -> List<Utxo>,
+        ): BoardingOutpoints {
+            val spendable = mutableListOf<Triple<OutPoint, Coin, BoardingOutput>>()
+            val expired = mutableListOf<Triple<OutPoint, Coin, BoardingOutput>>()
+            val pending = mutableListOf<Triple<OutPoint, Coin, BoardingOutput>>()
+            val spent = mutableListOf<Pair<OutPoint, Coin>>()
+            for (boardingOutput in boardingOutputs) {
+                val boardingAddress = boardingOutput.address
+                val onChainUtxos = getOnChainUtxos(boardingAddress)
+
+                for (utxo in onChainUtxos) {
+                    when {
+                        utxo.blockConfirmationTime > 0 && !utxo.isSpent -> {
+                            val now = (System.currentTimeMillis() / 1000).seconds
+                            val ownerCanExit =
+                                boardingOutput.canBeClaimedUnilaterally(
+                                    now,
+                                    utxo.blockConfirmationTime.toDuration(DurationUnit.SECONDS),
+                                )
+
+                            if (ownerCanExit) {
+                                expired.add(
+                                    Triple(utxo.outpoint, Coin.fromSatoshi(utxo.amount), boardingOutput),
+                                )
+                            } else {
+                                spendable.add(
+                                    Triple(utxo.outpoint, Coin.fromSatoshi(utxo.amount), boardingOutput),
+                                )
+                            }
+                        }
+                        utxo.isSpent -> {
+                            spent.add(Pair(utxo.outpoint, Coin.fromSatoshi(utxo.amount)))
+                        }
+                        else -> {
+                            pending.add(
+                                Triple(utxo.outpoint, Coin.fromSatoshi(utxo.amount), boardingOutput),
+                            )
+                        }
+                    }
+                }
+            }
+            return BoardingOutpoints(spendable, expired, pending, spent)
         }
     }
 }
