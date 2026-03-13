@@ -29,13 +29,13 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ark-core-debug
-          path: ./ark-core/build/outputs/aar/*.aar
+          path: ./ark-core/build/outputs/aar/*-debug.aar
 
       - name: Upload Release AAR
         uses: actions/upload-artifact@v7
         with:
           name: ark-core-release
-          path: ./ark-core/build/outputs/aar/*.aar
+          path: ./ark-core/build/outputs/aar/*-release.aar
 
   lint:
     environment: Development
