@@ -22,7 +22,7 @@ import fr.acinq.bitcoin.Script
  * * if the provided [witnessVersion] is not supported
  * * if the length of the provided witness program is not exactly 32 bytes
  */
-class Address(
+data class Address(
     val hrp: Hrp,
     val witnessVersion: WitnessVersion = WitnessVersion.TAPROOT,
     val witnessProgram: ByteArray,
@@ -111,6 +111,26 @@ class Address(
                 witnessProgram,
             )
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Address
+
+        if (hrp != other.hrp) return false
+        if (witnessVersion != other.witnessVersion) return false
+        if (!witnessProgram.contentEquals(other.witnessProgram)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = hrp.hashCode()
+        result = 31 * result + witnessVersion.hashCode()
+        result = 31 * result + witnessProgram.contentHashCode()
+        return result
     }
 }
 

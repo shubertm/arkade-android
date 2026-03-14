@@ -12,20 +12,19 @@ import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.ScriptTree
 import fr.acinq.bitcoin.XonlyPublicKey
-import java.lang.Math.multiplyExact
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 /**
- * The `BoardingInput` class represents a `UTXO` that can be used to create a `VTXO`
+ * The `BoardingOutput` class represents a `UTXO` that can be used to create a `VTXO`
  * during the boarding process.
- * [serverPubKey] is the Arkade operator's x-only public key
- * [ownerPubKey] is the Arkade user's x-only public key. This is the owner of the `UTXO`
- * [spendingInfo] is the information required to spend this `UTXO`
- * [address] is the address locking this `UTXO`
- * [exitDelay] (intervals) is the amount of time the owner waits for unilateral exit after transaction on chain confirmation
+ * @property serverPubKey is the Arkade operator's x-only public key
+ * @property ownerPubKey is the Arkade user's x-only public key. This is the owner of the `UTXO`
+ * @property spendingInfo is the information required to spend this `UTXO`
+ * @property address is the address locking this `UTXO`
+ * @property exitDelay (intervals) is the amount of time the owner waits for unilateral exit after transaction on chain confirmation
  */
 data class BoardingOutput(
     val serverPubKey: XonlyPublicKey,
@@ -111,15 +110,15 @@ data class BoardingOutput(
         now: Duration,
         blockConfirmTime: Duration,
     ): Boolean {
-        val exitDelaySeconds = multiplyExact(exitDelay, 512)
+        val exitDelaySeconds = Math.multiplyExact(exitDelay, 512)
         val exitTime = blockConfirmTime + exitDelaySeconds.toDuration(DurationUnit.SECONDS)
         return now >= exitTime
     }
 
     companion object {
         /**
-         * Creates a `BoardingInput`
-         * @param severPubKey is the Arkade operator's x-only public key
+         * Creates a `BoardingOutput`
+         * @param serverPubKey is the Arkade operator's x-only public key
          * @param ownerPubKey is the Arkade user's x-only public key. This is the owner of the `UTXO`
          * @param exitDelay (intervals) is the amount of time the owner waits for unilateral exit
          * after transaction on chain confirmation
@@ -194,17 +193,17 @@ data class BoardingOutpoints(
     /**
      * @return the amount of money that the owner can spend on-chain in collaboration with the server
      */
-    fun spendableBalance() = spendable.sumOf { it.second.amount.toDouble() }
+    fun spendableBalance() = spendable.sumOf { it.second.amount }
 
     /**
      * @return the amount of money that the owner can spend on-chain with unilateral exit
      */
-    fun expiredBalance() = expired.sumOf { it.second.amount.toDouble() }
+    fun expiredBalance() = expired.sumOf { it.second.amount }
 
     /**
      * @return the amount of money not yet confirmed on-chain
      */
-    fun pendingBalance() = pending.sumOf { it.second.amount.toDouble() }
+    fun pendingBalance() = pending.sumOf { it.second.amount }
 
     companion object {
         /**

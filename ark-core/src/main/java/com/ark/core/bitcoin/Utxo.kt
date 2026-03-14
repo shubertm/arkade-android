@@ -7,8 +7,7 @@ import fr.acinq.bitcoin.OutPoint
  *
  * @property outpoint is the reference of this UTXO on-chain
  * @property amount is the amount of value this UTXO has
- * @property blockConfirmationTime is the amount time elapsed since the first on-chain confirmation
- * of this UTXO
+ * @property blockConfirmationTime is the Unix timestamp (in seconds) when this UTXO was first confirmed on-chain
  * @property isSpent is whether this UTXO is already spent or not
  * @property address is the on-chain [Address] locking this UTXO
  */

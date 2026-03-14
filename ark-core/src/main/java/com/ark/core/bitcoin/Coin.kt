@@ -1,17 +1,20 @@
 package com.ark.core.bitcoin
 
+import java.math.BigDecimal
+
 /**
  * The `Coin` class represents the value and [Unit] of a [Utxo],
  * the [Unit] can be [Unit.BTC] or [Unit.SATOSHI]
  */
 data class Coin(
     val unit: Unit,
-    val amount: Float,
+    val amount: BigDecimal,
 ) {
     /**
      * Convert this [Coin] from [Unit.BTC] to [Unit.SATOSHI]
      */
     fun toSatoshi(): Coin {
+        if (unit == Unit.SATOSHI) return this
         val sats = amount * Unit.BASE
         return Coin(Unit.SATOSHI, sats)
     }
@@ -20,7 +23,8 @@ data class Coin(
      * Convert this [Coin] from [Unit.SATOSHI] to [Unit.BTC]
      */
     fun toBTC(): Coin {
-        val btc = amount / 100_000_000L
+        if (unit == Unit.BTC) return this
+        val btc = amount / Unit.BASE
         return Coin(Unit.BTC, btc)
     }
 
@@ -33,7 +37,7 @@ data class Coin(
         ;
 
         companion object {
-            internal const val BASE = 100_000_000L
+            internal val BASE = BigDecimal(100_000_000L)
         }
     }
 
@@ -42,12 +46,12 @@ data class Coin(
          * @param satoshi is the amount of money in [Unit.SATOSHI]
          * @return [Coin] in [Unit.SATOSHI]
          */
-        fun fromSatoshi(satoshi: Long): Coin = Coin(Unit.SATOSHI, satoshi.toFloat())
+        fun fromSatoshi(satoshi: Long): Coin = Coin(Unit.SATOSHI, satoshi.toBigDecimal())
 
         /**
          * @param btc is the amount of money in [Unit.BTC]
          * @return [Coin] in [Unit.BTC]
          */
-        fun fromBTC(btc: Float): Coin = Coin(Unit.BTC, btc)
+        fun fromBTC(btc: Float): Coin = Coin(Unit.BTC, btc.toBigDecimal())
     }
 }
