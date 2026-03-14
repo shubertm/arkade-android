@@ -7,8 +7,8 @@ import com.ark.core.bitcoin.Utxo
 import com.ark.core.taproot.Parity
 import com.ark.core.taproot.TaprootSpendingInfo
 import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.OutPoint
-import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.ScriptTree
 import fr.acinq.bitcoin.XonlyPublicKey
@@ -144,7 +144,7 @@ data class BoardingOutput(
                 )
             val merkleRoot = merkleTree.hash()
 
-            val internalKey = PublicKey.fromHex(UNSPENDABLE_PUBKEY).xOnly()
+            val internalKey = XonlyPublicKey(ByteVector32.fromValidHex(UNSPENDABLE_PUBKEY))
             val (outputKey, isOdd) = internalKey.outputKey(merkleTree)
             val spendingInfo =
                 TaprootSpendingInfo(
