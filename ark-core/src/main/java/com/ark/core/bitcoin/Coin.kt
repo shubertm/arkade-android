@@ -25,7 +25,7 @@ data class Coin(
      */
     fun toSatoshi(): Coin {
         if (unit == Unit.SATOSHI) return this
-        val sats = amount * Unit.BASE
+        val sats = amount.multiply(Unit.BASE).setScale(0, RoundingMode.UNNECESSARY)
         return Coin(Unit.SATOSHI, sats)
     }
 
@@ -36,6 +36,14 @@ data class Coin(
         if (unit == Unit.BTC) return this
         val btc = amount.divide(Unit.BASE, 8, RoundingMode.UNNECESSARY)
         return Coin(Unit.BTC, btc)
+    }
+
+    override fun equals(other: Any?): Boolean = other is Coin && unit == other.unit && amount.compareTo(other.amount) == 0
+
+    override fun hashCode(): Int {
+        var result = unit.hashCode()
+        result = 31 * result + amount.stripTrailingZeros().hashCode()
+        return result
     }
 
     /**
