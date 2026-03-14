@@ -173,19 +173,47 @@ data class BoardingOutput(
     }
 }
 
+/**
+ * The `BoardingOutpoints` class keeps on-chain references of all boarding outputs (UTXOs) in these four
+ * states
+ *
+ * [spendable] references UTXOs that can be spent in collaboration with the server
+ *
+ * [expired] references UTXOs that can only be spent unilaterally by the owner
+ *
+ * [pending] references UTXOs awaiting on-chain confirmation
+ *
+ * [spent] references UTXOs that have been spent already
+ */
 data class BoardingOutpoints(
     val spendable: List<Triple<OutPoint, Coin, BoardingOutput>>,
     val expired: List<Triple<OutPoint, Coin, BoardingOutput>>,
     val pending: List<Triple<OutPoint, Coin, BoardingOutput>>,
     val spent: List<Pair<OutPoint, Coin>>,
 ) {
+    /**
+     * @return the amount of money that the owner can spend on-chain in collaboration with the server
+     */
     fun spendableBalance() = spendable.sumOf { it.second.amount.toDouble() }
 
+    /**
+     * @return the amount of money that the owner can spend on-chain with unilateral exit
+     */
     fun expiredBalance() = expired.sumOf { it.second.amount.toDouble() }
 
+    /**
+     * @return the amount of money not yet confirmed on-chain
+     */
     fun pendingBalance() = pending.sumOf { it.second.amount.toDouble() }
 
     companion object {
+        /**
+         * Creates [BoardingOutpoints] from [BoardingOutput]s and a list of on-chain [Utxo]s
+         * @param boardingOutputs is the list of all [BoardingOutput]s available
+         * @param getOnChainUtxos returns a list of on-chain [Utxo]s that belong to the [Address]
+         * provided
+         * @return [BoardingOutpoints]
+         */
         fun fromBoardingOutputs(
             boardingOutputs: List<BoardingOutput>,
             getOnChainUtxos: (Address) -> List<Utxo>,
