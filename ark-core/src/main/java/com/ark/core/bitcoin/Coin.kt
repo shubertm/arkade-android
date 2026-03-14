@@ -13,7 +13,6 @@ data class Coin(
 ) {
     init {
         require(amount >= BigDecimal.ZERO) { "Amount cannot be negative" }
-        require(unit == Unit.BTC || unit == Unit.SATOSHI) { "Invalid unit" }
         when (unit) {
             Unit.BTC -> require(amount.scale() <= 8) { "BTC amount must have at most 8 decimal places" }
             Unit.SATOSHI -> require(amount.scale() <= 0) { "Satoshi amount must have no decimal places" }
