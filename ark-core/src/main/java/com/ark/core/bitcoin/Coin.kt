@@ -1,6 +1,7 @@
 package com.ark.core.bitcoin
 
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 /**
  * The `Coin` class represents the value and [Unit] of a [Utxo],
@@ -24,7 +25,7 @@ data class Coin(
      */
     fun toBTC(): Coin {
         if (unit == Unit.BTC) return this
-        val btc = amount / Unit.BASE
+        val btc = amount.divide(Unit.BASE, 8, RoundingMode.UNNECESSARY)
         return Coin(Unit.BTC, btc)
     }
 
@@ -52,6 +53,6 @@ data class Coin(
          * @param btc is the amount of money in [Unit.BTC]
          * @return [Coin] in [Unit.BTC]
          */
-        fun fromBTC(btc: Float): Coin = Coin(Unit.BTC, btc.toBigDecimal())
+        fun fromBTC(btc: BigDecimal): Coin = Coin(Unit.BTC, btc)
     }
 }
