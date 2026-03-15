@@ -129,8 +129,8 @@ class BoardingOutputTest {
         assertEquals(merkleRoot, boardingOutput.spendingInfo.merkleRoot)
         assertEquals(scriptTree, boardingOutput.spendingInfo.merkleScriptTree)
 
-        val arkAddress = boardingOutput.getArkAddress(Network.MAINNET, serverPubKey)
-        assertEquals(ArkHrp.MAINNET, arkAddress.hrp)
+        val arkAddress = boardingOutput.getArkAddress(Network.TESTNET, serverPubKey)
+        assertEquals(ArkHrp.TESTNET, arkAddress.hrp)
         assertEquals(serverPubKey.value.toHex(), arkAddress.serverPubKey.toHexString())
         assertEquals(outputKey.value.toHex(), arkAddress.vtxoTaprootPubKey.toHexString())
         assertEquals(scriptPubKey.toHexString(), arkAddress.toP2TRScriptPubkey().toHexString())
@@ -190,8 +190,8 @@ class BoardingOutputTest {
         assertEquals(merkleRoot, boardingOutput.spendingInfo.merkleRoot)
         assertEquals(scriptTree, boardingOutput.spendingInfo.merkleScriptTree)
 
-        val arkAddress = boardingOutput.getArkAddress(Network.MAINNET, serverPubKey)
-        assertEquals(ArkHrp.MAINNET, arkAddress.hrp)
+        val arkAddress = boardingOutput.getArkAddress(Network.REGTEST, serverPubKey)
+        assertEquals(ArkHrp.TESTNET, arkAddress.hrp)
         assertEquals(serverPubKey.value.toHex(), arkAddress.serverPubKey.toHexString())
         assertEquals(outputKey.value.toHex(), arkAddress.vtxoTaprootPubKey.toHexString())
         assertEquals(scriptPubKey.toHexString(), arkAddress.toP2TRScriptPubkey().toHexString())
