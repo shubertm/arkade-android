@@ -6,9 +6,11 @@ import com.arkade.core.taproot.Parity
 import com.arkade.core.taproot.TaprootSpendingInfo
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
+import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.ScriptTree
 import fr.acinq.bitcoin.XonlyPublicKey
+import java.math.BigDecimal
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -229,5 +231,23 @@ data class ScriptSpendingPath(
         var result = script.contentHashCode()
         result = 31 * result + control.contentHashCode()
         return result
+    }
+}
+
+data class VirtualTxOutPoint(
+    val outpoint: OutPoint,
+    val amount: BigDecimal,
+)
+
+data class VirtualTxOutPoints(
+    val spendable: List<Pair<VirtualTxOutPoint, Vtxo>>,
+    val expired: List<Pair<VirtualTxOutPoint, Vtxo>>,
+) {
+    fun spendableBalance() = spendable.sumOf { it.first.amount }
+
+    fun expiredBalance() = expired.sumOf { it.first.amount }
+
+    companion object {
+        fun fromBoardingOutputs(): VirtualTxOutPoints = VirtualTxOutPoints(listOf(), listOf())
     }
 }
