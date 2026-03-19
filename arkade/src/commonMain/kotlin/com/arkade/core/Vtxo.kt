@@ -190,7 +190,7 @@ data class Vtxo(
                 }
             val address = Address.fromScriptPubKey(scriptPubKey, network)
 
-            val exitDelaySeconds = exitDelay.multiplyExact( 512)
+            val exitDelaySeconds = exitDelay.multiplyExact(512)
 
             return Vtxo(
                 serverPubKey,

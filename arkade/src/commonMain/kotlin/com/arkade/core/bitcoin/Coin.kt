@@ -1,8 +1,6 @@
 package com.arkade.core.bitcoin
 
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
-import com.ionspin.kotlin.bignum.decimal.DecimalMode
-import com.ionspin.kotlin.bignum.decimal.RoundingMode
 import com.ionspin.kotlin.bignum.decimal.toBigDecimal
 import kotlin.require
 
@@ -45,8 +43,9 @@ data class Coin(
      * The `Unit` enum class represents the units in which a [Utxo] value can be presented in.
      */
     enum class Unit {
-         BTC,
-        SATOSHI;
+        BTC,
+        SATOSHI,
+        ;
 
         companion object {
             internal val BASE = BigDecimal.fromLong(100_000_000L)

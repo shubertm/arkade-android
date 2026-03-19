@@ -12,6 +12,7 @@ import fr.acinq.bitcoin.ScriptTree
 import fr.acinq.bitcoin.XonlyPublicKey
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class VtxoTest {
     val serverPubKey = PublicKey.fromHex("03a19310a999207dbd9a03d20f649e37c7a578a07d75e6fa19aa3f33fc6b15622c").xOnly()
@@ -178,17 +179,19 @@ class VtxoTest {
         assertEquals(scriptTree, vtxo.spendingInfo.merkleScriptTree)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun mainnet_should_fail_on_invalid_number_of_tap_scripts() {
         val forfeitScript = multisigScript(serverPubKey, ownerPubKey)
         assertEquals(68, forfeitScript.size)
 
-        Vtxo.fromScripts(
-            serverPubKey,
-            ownerPubKey,
-            listOf(forfeitScript),
-            144L,
-            Network.MAINNET,
-        )
+        assertFailsWith<IllegalArgumentException> {
+            Vtxo.fromScripts(
+                serverPubKey,
+                ownerPubKey,
+                listOf(forfeitScript),
+                144L,
+                Network.MAINNET,
+            )
+        }
     }
 }

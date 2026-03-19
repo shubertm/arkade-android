@@ -1,8 +1,9 @@
 package com.arkade.core
 
 import fr.acinq.bitcoin.PublicKey
-import junit.framework.TestCase.assertEquals
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class ScriptTest {
     @Test
@@ -24,15 +25,19 @@ class ScriptTest {
         assertEquals(multisigScript, multisigScriptGenerated.toHexString())
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun csv_script_generation_should_fail_on_invalid_lock_time_above_range() {
         val ownerPubKey = PublicKey.fromHex("0315fbe13a8cf7e4d0c81b0caf4040f37666933d97080abb04f908964bb14588a8").xOnly()
-        csvSigScript(0xFFFFE, ownerPubKey)
+        assertFailsWith<IllegalArgumentException> {
+            csvSigScript(0xFFFFE, ownerPubKey)
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun csv_script_generation_should_fail_on_invalid_lock_time_below_range() {
         val ownerPubKey = PublicKey.fromHex("0315fbe13a8cf7e4d0c81b0caf4040f37666933d97080abb04f908964bb14588a8").xOnly()
-        csvSigScript(-0x01, ownerPubKey)
+        assertFailsWith<IllegalArgumentException> {
+            csvSigScript(-0x01, ownerPubKey)
+        }
     }
 }

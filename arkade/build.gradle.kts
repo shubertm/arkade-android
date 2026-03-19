@@ -1,12 +1,15 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import com.android.build.gradle.internal.tasks.factory.dependsOn
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.android.lint)
+    alias(libs.plugins.ktlint.gradle)
 }
 
-val currentOs: org.gradle.internal.os.OperatingSystem = org.gradle.internal.os.OperatingSystem.current()
+val currentOs: org.gradle.internal.os.OperatingSystem =
+    org.gradle.internal.os.OperatingSystem
+        .current()
 
 kotlin {
 
@@ -72,13 +75,20 @@ kotlin {
 
         jvmTest {
             dependencies {
-                val targetDep = when  {
-                    currentOs.isLinux -> libs.secp256k1.kmp.jni.jvm.linux
-                    currentOs.isWindows -> libs.secp256k1.kmp.jni.jvm.windows
-                    currentOs.isMacOsX -> libs.secp256k1.kmp.jni.jvm.macos
-                    else -> error("Unsupported OS: $currentOs")
-                }
+                val targetDep =
+                    when {
+                        currentOs.isLinux -> libs.secp256k1.kmp.jni.jvm.linux
+                        currentOs.isWindows -> libs.secp256k1.kmp.jni.jvm.windows
+                        currentOs.isMacOsX -> libs.secp256k1.kmp.jni.jvm.macos
+                        else -> error("Unsupported OS: $currentOs")
+                    }
                 implementation(targetDep)
+            }
+        }
+
+        getByName("androidHostTest") {
+            dependencies {
+                implementation(libs.secp256k1.kmp.jni.jvm)
             }
         }
 
@@ -91,3 +101,7 @@ kotlin {
         }
     }
 }
+
+tasks.androidPreBuild.dependsOn("ktlintCheck")
+tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")
+tasks.getByName("ktlintCheck").dependsOn("ktlintFormat")

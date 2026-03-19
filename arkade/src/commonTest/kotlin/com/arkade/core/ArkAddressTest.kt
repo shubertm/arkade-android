@@ -3,6 +3,7 @@ package com.arkade.core
 import fr.acinq.bitcoin.Bech32
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 /**
  * Test decoding and encoding Ark addresses, generating Taproot ScriptPubKey and SubDust ScriptPubKey
@@ -47,58 +48,68 @@ class ArkAddressTest {
         )
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun fail_decoding_on_unsupported_address_version() {
         val address =
             "tark1qyellv77udfmr20tun8dvju5vgudpf9vxe8jwhthrkn26fz96pawqfdy8nk05rs" +
                 "mrf8h94j26905e7n6sng8y059z8ykn2j5xcuw4xt82zz7h8"
-        ArkAddress.decode(address)
+        assertFailsWith<IllegalArgumentException> {
+            ArkAddress.decode(address)
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun fail_decoding_on_invalid_bech32_encoding() {
         val address =
             "tark1qqellv77udfmr20tun8dvju5vgudpf9vxe8jwhthrkn26fz96pawqfdy8nk05rs" +
                 "mrf8h94j26905e7n6sng8y059z8ykn2j5xcuw4xt8qxs7ly"
-        ArkAddress.decode(address)
+        assertFailsWith<IllegalArgumentException> {
+            ArkAddress.decode(address)
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun fail_decoding_on_invalid_payload_length() {
         val address =
             "tark1qqellv77udfmr20tun8dvju5vgudpf9vxe8jwhthrkn26fz96pawqfdy8nk05rs" +
                 "mrf8h94j26905e7n6sng8y059z8ykn2j5xcuw4xt8ykjrem86pcd35nmj6e9dzh6vlfagf5rj8" +
                 "6z3rjtf4f2rvw82n9ns8c73mu"
-        ArkAddress.decode(address)
+        assertFailsWith<IllegalArgumentException> {
+            ArkAddress.decode(address)
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun fail_decoding_on_invalid_server_pubkey_size() {
         val address =
             "tark1qqellv77udfmr20tun8dvju5vgudpf9vxe8jwhthrkn26fz96pawqfdy8nk05rs" +
                 "mrf8h94j26905e7n6sng8y059z8ykn2j5xcuw4xt8ykjrem86pcd35nmj6e9dzh6vlfagf5rj8" +
                 "6z3rjtf4f2rvw82n9ns8c73mu"
         val (hrp, bytes, encoding) = Bech32.decodeBytes(address)
-        ArkAddress(
-            ArkHrp.fromString(hrp),
-            bytes[0].toInt(),
-            bytes.copyOfRange(1, 49),
-            bytes.copyOfRange(49, 97),
-        )
+        assertFailsWith<IllegalArgumentException> {
+            ArkAddress(
+                ArkHrp.fromString(hrp),
+                bytes[0].toInt(),
+                bytes.copyOfRange(1, 49),
+                bytes.copyOfRange(49, 97),
+            )
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun fail_decoding_on_invalid_vtxo_taproot_pubkey_size() {
         val address =
             "tark1qqellv77udfmr20tun8dvju5vgudpf9vxe8jwhthrkn26fz96pawqfdy8nk05rs" +
                 "mrf8h94j26905e7n6sng8y059z8ykn2j5xcuw4xt8ykjrem86pcd35nmj6e9dzh6vlfagf5rj8" +
                 "6z3rjtf4f2rvw82n9ns8c73mu"
         val (hrp, bytes, encoding) = Bech32.decodeBytes(address)
-        ArkAddress(
-            ArkHrp.fromString(hrp),
-            bytes[0].toInt(),
-            bytes.copyOfRange(1, 33),
-            bytes.copyOfRange(33, 97),
-        )
+        assertFailsWith<IllegalArgumentException> {
+            ArkAddress(
+                ArkHrp.fromString(hrp),
+                bytes[0].toInt(),
+                bytes.copyOfRange(1, 33),
+                bytes.copyOfRange(33, 97),
+            )
+        }
     }
 }

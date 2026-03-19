@@ -6,6 +6,7 @@ import com.arkade.core.bitcoin.Network
 import com.arkade.core.bitcoin.WitnessVersion
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class OnChainAddressTest {
     val mainnetAddress = "bc1pjhe7sjma3rnkdfelsrj5l6g58z9ysclkrjxgy0duxcp9k6r9atjst0yf78"
@@ -34,24 +35,28 @@ class OnChainAddressTest {
         assertEquals(scriptPubKey.toHexString(), decoded.toScriptPubKey().toHexString())
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun mainnet_fail_creating_address_on_unsupported_witness_version() {
         val decoded = Address.decode(mainnetAddress)
-        Address(
-            Hrp.MAINNET,
-            WitnessVersion.fromInt(3),
-            decoded.witnessProgram,
-        )
+        assertFailsWith<IllegalArgumentException> {
+            Address(
+                Hrp.MAINNET,
+                WitnessVersion.fromInt(3),
+                decoded.witnessProgram,
+            )
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun mainnet_fail_creating_address_on_invalid_witness_program_length() {
         val decoded = Address.decode(mainnetAddress)
-        Address(
-            Hrp.MAINNET,
-            WitnessVersion.TAPROOT,
-            decoded.witnessProgram.copyOfRange(3, 16),
-        )
+        assertFailsWith<IllegalArgumentException> {
+            Address(
+                Hrp.MAINNET,
+                WitnessVersion.TAPROOT,
+                decoded.witnessProgram.copyOfRange(3, 16),
+            )
+        }
     }
 
     @Test
@@ -76,24 +81,28 @@ class OnChainAddressTest {
         assertEquals(scriptPubKey.toHexString(), decoded.toScriptPubKey().toHexString())
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun testnet_fail_creating_address_on_unsupported_witness_version() {
         val decoded = Address.decode(testnetAddress)
-        Address(
-            Hrp.TESTNETS,
-            WitnessVersion.fromInt(3),
-            decoded.witnessProgram,
-        )
+        assertFailsWith<IllegalArgumentException> {
+            Address(
+                Hrp.TESTNETS,
+                WitnessVersion.fromInt(3),
+                decoded.witnessProgram,
+            )
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun testnet_fail_creating_address_on_invalid_witness_program_length() {
         val decoded = Address.decode(testnetAddress)
-        Address(
-            Hrp.TESTNETS,
-            WitnessVersion.TAPROOT,
-            decoded.witnessProgram.copyOfRange(3, 16),
-        )
+        assertFailsWith<IllegalArgumentException> {
+            Address(
+                Hrp.TESTNETS,
+                WitnessVersion.TAPROOT,
+                decoded.witnessProgram.copyOfRange(3, 16),
+            )
+        }
     }
 
     @Test
@@ -118,23 +127,27 @@ class OnChainAddressTest {
         assertEquals(scriptPubKey.toHexString(), decoded.toScriptPubKey().toHexString())
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun regtest_fail_creating_address_on_unsupported_witness_version() {
         val decoded = Address.decode(regtestAddress)
-        Address(
-            Hrp.REGTEST,
-            WitnessVersion.fromInt(3),
-            decoded.witnessProgram,
-        )
+        assertFailsWith<IllegalArgumentException> {
+            Address(
+                Hrp.REGTEST,
+                WitnessVersion.fromInt(3),
+                decoded.witnessProgram,
+            )
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun regtest_fail_creating_address_on_invalid_witness_program_length() {
         val decoded = Address.decode(regtestAddress)
-        Address(
-            Hrp.REGTEST,
-            WitnessVersion.TAPROOT,
-            decoded.witnessProgram.copyOfRange(3, 16),
-        )
+        assertFailsWith<IllegalArgumentException> {
+            Address(
+                Hrp.REGTEST,
+                WitnessVersion.TAPROOT,
+                decoded.witnessProgram.copyOfRange(3, 16),
+            )
+        }
     }
 }
