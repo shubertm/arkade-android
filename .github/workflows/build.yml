@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: arkade-jvm
-          path: ./arkade/build/libs/aar/arkade.jar
+          path: ./arkade/build/libs/arkade.jar
 
   test:
     needs: [lint, ktlint]
@@ -78,7 +78,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: lint-results
-          path: ./ark-core/build/reports/*.html
+          path: ./arkade/build/reports/*.html
 
   ktlint:
     environment: Development
