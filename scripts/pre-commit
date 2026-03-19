@@ -18,15 +18,7 @@ if [ "$STASH_COUNT_AFTER" -gt "$STASH_COUNT_BEFORE" ]; then
   trap "git stash pop --quiet" EXIT
 fi
 
-./gradlew testDebugUnitTest
-
-status=$?
-if [ "$status" != 0 ]; then
-  echo "Some debug unit tests are failing!"
-  exit 1
-fi
-
-./gradlew testReleaseUnitTest
+./gradlew allTests
 
 status=$?
 if [ "$status" = 0 ]; then
