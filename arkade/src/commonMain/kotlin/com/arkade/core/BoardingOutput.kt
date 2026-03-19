@@ -130,12 +130,12 @@ data class BoardingOutput(
          * @return a `BoardingInput` that can be used to create a `VTXO`
          */
         fun create(
-            severPubKey: XonlyPublicKey,
+            serverPubKey: XonlyPublicKey,
             ownerPubKey: XonlyPublicKey,
             exitDelay: Long,
             network: Network,
         ): BoardingOutput {
-            val multisigScript = multisigScript(severPubKey, ownerPubKey)
+            val multisigScript = multisigScript(serverPubKey, ownerPubKey)
             val csvScript = csvSigScript(exitDelay, ownerPubKey)
 
             val merkleTree =
@@ -163,7 +163,7 @@ data class BoardingOutput(
             val address = Address.fromScriptPubKey(scriptPubKey, network)
 
             return BoardingOutput(
-                severPubKey,
+                serverPubKey,
                 ownerPubKey,
                 spendingInfo,
                 address,

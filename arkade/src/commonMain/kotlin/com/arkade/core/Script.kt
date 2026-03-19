@@ -31,6 +31,7 @@ fun multisigScript(
  * @param lockTime is the wait time for the exit after on-chain confirmation
  * @param ownerPubKey is the x-only public key for the `VTXO` owner
  * @return a `CSV` script for unilateral exit
+ * @throws IllegalArgumentException if the [lockTime] is not with the range [[0, 65535]]
  */
 fun csvSigScript(
     lockTime: Long,

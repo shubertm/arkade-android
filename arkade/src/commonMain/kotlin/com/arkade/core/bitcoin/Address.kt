@@ -102,12 +102,11 @@ data class Address(
             require(witnessVersion == WitnessVersion.SEGWIT || witnessVersion == WitnessVersion.TAPROOT) {
                 "Unsupported witness version"
             }
-            val witnessVersionByte = scriptPubKey[0]
             val witnessProgram = scriptPubKey.copyOfRange(2, 34)
             val hrp = Hrp.fromNetwork(network)
             return Address(
                 hrp,
-                WitnessVersion.fromByte(witnessVersionByte),
+                witnessVersion,
                 witnessProgram,
             )
         }
