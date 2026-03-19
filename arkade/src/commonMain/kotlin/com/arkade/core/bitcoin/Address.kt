@@ -32,7 +32,9 @@ data class Address(
             "Unsupported witness version"
         }
         val witnessProgramSize = witnessProgram.size
-        require(witnessProgramSize == 32) { "Invalid witness program length, expected 32 bytes, but got $witnessProgramSize" }
+        require(witnessProgramSize == 32 || witnessProgramSize == 20) {
+            "Invalid witness program length, expected 32 bytes, but got $witnessProgramSize"
+        }
     }
 
     /**
@@ -151,6 +153,7 @@ enum class WitnessVersion {
             throw IllegalArgumentException("Unsupported witness version")
         }
 
+        // This function should be made forward compatible, now it only decodes SEGWIT v0 and v1
         fun fromByte(version: Byte): WitnessVersion {
             var ver = version.toInt()
             // For Taproot raw witness version

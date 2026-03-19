@@ -18,7 +18,7 @@ enum class Hrp(
             }
 
         fun fromString(prefix: String): Hrp =
-            when (prefix) {
+            when (prefix.lowercase()) {
                 MAINNET.prefix -> MAINNET
                 TESTNETS.prefix -> TESTNETS
                 REGTEST.prefix -> REGTEST

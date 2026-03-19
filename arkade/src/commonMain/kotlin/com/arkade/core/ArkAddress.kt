@@ -111,7 +111,7 @@ class ArkAddress(
             require(encoding == Bech32.Encoding.Bech32m) { "Invalid Bech32 encoding: $encoding" }
             val bytesSize = bytes.size
             require(bytesSize == 65) { "Invalid payload length: $bytesSize" }
-            val version = bytes[0].toInt()
+            val version = bytes[0].toUByte().toInt()
             require(version == 0) { "Unsupported address version: $version" }
 
             val serverPubKey = bytes.copyOfRange(1, 33)

@@ -31,12 +31,14 @@ jobs:
         with:
           name: arkade-android
           path: ./arkade/build/outputs/aar/*.aar
+          if-no-files-found: error
 
       - name: Upload JAR
         uses: actions/upload-artifact@v7
         with:
           name: arkade-jvm
           path: ./arkade/build/libs/arkade.jar
+          if-no-files-found: error
 
   test:
     needs: [lint, ktlint]

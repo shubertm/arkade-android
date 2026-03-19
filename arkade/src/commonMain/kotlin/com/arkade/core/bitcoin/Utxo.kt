@@ -17,4 +17,9 @@ data class Utxo(
     val blockConfirmationTime: Long,
     val isSpent: Boolean = false,
     val address: Address? = null,
-)
+) {
+    init {
+        require(amount >= 0) { "Amount cannot be negative" }
+        require(blockConfirmationTime >= 0) { "Block confirmation time cannot be negative" }
+    }
+}

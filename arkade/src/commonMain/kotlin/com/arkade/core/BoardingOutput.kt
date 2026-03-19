@@ -83,18 +83,18 @@ data class BoardingOutput(
      * @return the script and control block for spending this `UTXO` collaboratively encapsulated in [ScriptSpendingPath]
      */
     fun getForfeitSpendingInfo(): ScriptSpendingPath {
-        val script = tapScripts[0]
+        val script = tapScripts[0].copyOf()
         val controlBlock = getControlBlock(script)
-        return ScriptSpendingPath(script, controlBlock)
+        return ScriptSpendingPath(script, controlBlock.copyOf())
     }
 
     /**
      * @return the script and control block for spending this `UTXO` unilaterally encapsulated in [ScriptSpendingPath]
      */
     fun getExitSpendingInfo(): ScriptSpendingPath {
-        val script = tapScripts[1]
+        val script = tapScripts[1].copyOf()
         val controlBlock = getControlBlock(script)
-        return ScriptSpendingPath(script, controlBlock)
+        return ScriptSpendingPath(script, controlBlock.copyOf())
     }
 
     /**

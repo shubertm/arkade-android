@@ -36,18 +36,6 @@ class OnChainAddressTest {
     }
 
     @Test
-    fun mainnet_fail_creating_address_on_unsupported_witness_version() {
-        val decoded = Address.decode(mainnetAddress)
-        assertFailsWith<IllegalArgumentException> {
-            Address(
-                Hrp.MAINNET,
-                WitnessVersion.fromInt(3),
-                decoded.witnessProgram,
-            )
-        }
-    }
-
-    @Test
     fun mainnet_fail_creating_address_on_invalid_witness_program_length() {
         val decoded = Address.decode(mainnetAddress)
         assertFailsWith<IllegalArgumentException> {
@@ -79,18 +67,6 @@ class OnChainAddressTest {
         assertEquals(testnetAddress, encoded)
 
         assertEquals(scriptPubKey.toHexString(), decoded.toScriptPubKey().toHexString())
-    }
-
-    @Test
-    fun testnet_fail_creating_address_on_unsupported_witness_version() {
-        val decoded = Address.decode(testnetAddress)
-        assertFailsWith<IllegalArgumentException> {
-            Address(
-                Hrp.TESTNETS,
-                WitnessVersion.fromInt(3),
-                decoded.witnessProgram,
-            )
-        }
     }
 
     @Test
@@ -128,18 +104,6 @@ class OnChainAddressTest {
     }
 
     @Test
-    fun regtest_fail_creating_address_on_unsupported_witness_version() {
-        val decoded = Address.decode(regtestAddress)
-        assertFailsWith<IllegalArgumentException> {
-            Address(
-                Hrp.REGTEST,
-                WitnessVersion.fromInt(3),
-                decoded.witnessProgram,
-            )
-        }
-    }
-
-    @Test
     fun regtest_fail_creating_address_on_invalid_witness_program_length() {
         val decoded = Address.decode(regtestAddress)
         assertFailsWith<IllegalArgumentException> {
@@ -148,6 +112,13 @@ class OnChainAddressTest {
                 WitnessVersion.TAPROOT,
                 decoded.witnessProgram.copyOfRange(3, 16),
             )
+        }
+    }
+
+    @Test
+    fun fail_on_unsupported_witness_version() {
+        assertFailsWith<IllegalArgumentException> {
+            WitnessVersion.fromInt(3)
         }
     }
 }
