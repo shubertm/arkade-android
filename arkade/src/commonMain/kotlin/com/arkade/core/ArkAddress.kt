@@ -48,9 +48,10 @@ class ArkAddress(
      * Generate an Ark address as a [Bech32.Encoding.Bech32m] `String`
      * */
     fun encode(): String {
-        var bytes = ByteArray(1)
-        bytes[0] = version.toByte()
-        bytes = bytes + serverPubKey + vtxoTaprootPubKey
+        val bytes = ByteArray(65)
+        bytes[0] = (version and 0xFF).toByte()
+        serverPubKey.copyInto(bytes, 1)
+        vtxoTaprootPubKey.copyInto(bytes, 33)
         val address = Bech32.encodeBytes(hrp.prefix, bytes, Bech32.Encoding.Bech32m)
         return address
     }
