@@ -8,9 +8,7 @@ plugins {
     alias(libs.plugins.ktlint.gradle)
 }
 
-val currentOs: org.gradle.internal.os.OperatingSystem =
-    org.gradle.internal.os.OperatingSystem
-        .current()
+val currentOs: String = System.getProperty("os.name").lowercase()
 
 kotlin {
 
@@ -27,8 +25,7 @@ kotlin {
         }
         minSdk = 26
 
-        withHostTestBuilder {
-        }
+        withHostTestBuilder {}
 
         withDeviceTestBuilder {
             sourceSetTreeName = "test"
@@ -77,9 +74,9 @@ kotlin {
             dependencies {
                 val targetDep =
                     when {
-                        currentOs.isLinux -> libs.secp256k1.kmp.jni.jvm.linux
-                        currentOs.isWindows -> libs.secp256k1.kmp.jni.jvm.windows
-                        currentOs.isMacOsX -> libs.secp256k1.kmp.jni.jvm.macos
+                        currentOs.contains("linux") -> libs.secp256k1.kmp.jni.jvm.linux
+                        currentOs.contains("windows") -> libs.secp256k1.kmp.jni.jvm.windows
+                        currentOs.contains("mac") || currentOs.contains("darwin") -> libs.secp256k1.kmp.jni.jvm.macos
                         else -> error("Unsupported OS: $currentOs")
                     }
                 implementation(targetDep)
@@ -104,4 +101,3 @@ kotlin {
 
 tasks.androidPreBuild.dependsOn("ktlintCheck")
 tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")
-tasks.getByName("ktlintCheck").dependsOn("ktlintFormat")
