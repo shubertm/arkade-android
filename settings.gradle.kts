@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "android-sdk"
 include(":app")
-include(":ark-core")
+include(":arkade")
