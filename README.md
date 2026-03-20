@@ -10,4 +10,5 @@
 An Android SDK for building native Android Bitcoin wallets for smooth off-chain transactions using Ark Protocol.
 
 ## Modules
- - ```ark-core``` : The core Arkade types and utilities for the Ark protocol
+ - `arkade` : The core Arkade types and utilities for the Ark protocol
+ - `app`: The sample app for reference
