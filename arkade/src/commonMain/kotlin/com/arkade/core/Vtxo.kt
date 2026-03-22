@@ -266,9 +266,14 @@ data class VirtualTxOutPoints(
                             .now()
                             .epochSeconds.seconds
                     val onChainVtxo = onChainVtxos.find { it.outpoint == vtxoOutPoint.outpoint }
+                    if (onChainVtxo == null) {
+                        continue
+                    }
+                    if (onChainVtxo.isSpent) {
+                        continue
+                    }
                     if (
-                        onChainVtxo != null &&
-                        onChainVtxo.blockConfirmationTime != 0L &&
+                        onChainVtxo.blockConfirmationTime > 0L &&
                         vtxo.canBeClaimedUnilaterally(
                             now,
                             onChainVtxo.blockConfirmationTime.seconds,
