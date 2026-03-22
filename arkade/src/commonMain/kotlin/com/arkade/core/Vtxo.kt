@@ -2,16 +2,19 @@ package com.arkade.core
 
 import com.arkade.core.bitcoin.Address
 import com.arkade.core.bitcoin.Network
+import com.arkade.core.bitcoin.Utxo
 import com.arkade.core.taproot.Parity
 import com.arkade.core.taproot.TaprootSpendingInfo
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import fr.acinq.bitcoin.ByteVector
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.ScriptTree
 import fr.acinq.bitcoin.XonlyPublicKey
-import java.math.BigDecimal
+import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -248,6 +251,37 @@ data class VirtualTxOutPoints(
     fun expiredBalance() = expired.sumOf { it.first.amount }
 
     companion object {
-        fun fromBoardingOutputs(): VirtualTxOutPoints = VirtualTxOutPoints(listOf(), listOf())
+        fun get(
+            spendableVtxos: HashMap<Vtxo, List<VirtualTxOutPoint>>,
+            getOnChainVtxos: (Address) -> List<Utxo>,
+        ): VirtualTxOutPoints {
+            val spendable = mutableListOf<Pair<VirtualTxOutPoint, Vtxo>>()
+            val expired = mutableListOf<Pair<VirtualTxOutPoint, Vtxo>>()
+
+            for ((vtxo, vtxoOutPoints) in spendableVtxos) {
+                val onChainVtxos = getOnChainVtxos(vtxo.address)
+                for (vtxoOutPoint in vtxoOutPoints) {
+                    val now =
+                        Clock.System
+                            .now()
+                            .epochSeconds.seconds
+                    val onChainVtxo = onChainVtxos.find { it.outpoint == vtxoOutPoint.outpoint }
+                    if (
+                        onChainVtxo != null &&
+                        onChainVtxo.blockConfirmationTime != 0L &&
+                        vtxo.canBeClaimedUnilaterally(
+                            now,
+                            onChainVtxo.blockConfirmationTime.seconds,
+                        )
+                    ) {
+                        expired.add(vtxoOutPoint to vtxo)
+                        continue
+                    }
+                    spendable.add(vtxoOutPoint to vtxo)
+                }
+            }
+
+            return VirtualTxOutPoints(spendable, expired)
+        }
     }
 }
