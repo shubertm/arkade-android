@@ -23,7 +23,7 @@ kotlin {
         compileSdk {
             version = release(36) { minorApiLevel = 1 }
         }
-        minSdk = 26
+        minSdk = 24
 
         withHostTestBuilder {}
 
