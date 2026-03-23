@@ -229,7 +229,10 @@ data class BoardingOutpoints(
                 for (utxo in onChainUtxos) {
                     when {
                         utxo.blockConfirmationTime > 0 && !utxo.isSpent -> {
-                            val now = (Clock.System.now().toEpochMilliseconds() / 1000).seconds
+                            val now =
+                                Clock.System
+                                    .now()
+                                    .epochSeconds.seconds
                             val ownerCanExit =
                                 boardingOutput.canBeClaimedUnilaterally(
                                     now,
