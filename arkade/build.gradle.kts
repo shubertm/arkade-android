@@ -6,9 +6,15 @@ plugins {
     alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.android.lint)
     alias(libs.plugins.ktlint.gradle)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.square.wire)
 }
 
 val currentOs: String = System.getProperty("os.name").lowercase()
+
+wire {
+    kotlin {}
+}
 
 kotlin {
 
@@ -61,6 +67,9 @@ kotlin {
                 implementation(libs.bitcoin.kmp)
                 implementation(libs.secp256k1.kmp)
                 implementation(libs.bignum)
+                implementation(libs.kotlinx.serialization.protobuf)
+                implementation(libs.square.wire.runtime)
+                implementation(libs.square.wire.grpc.client)
             }
         }
 

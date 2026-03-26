@@ -1,0 +1,4 @@
+root = true
+
+[**/generated/**]
+ktlint=disabled
