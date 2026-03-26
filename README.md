@@ -1,4 +1,4 @@
-<h1 align="center">Arkade Android SDK</h1>
+<h1 align="center">Arkade Kotlin Multiplatform SDK</h1>
 <p align="center">
 <a href="https://github.com/shubertm/arkade-android/actions/workflows/build.yml"> 
 <img src="https://github.com/shubertm/arkade-android/actions/workflows/build.yml/badge.svg" alt="build status">
@@ -7,8 +7,13 @@
 
 **EXPERIMENTAL!** Do not use in production.
 
-An Android SDK for building native Android Bitcoin wallets for smooth off-chain transactions using Ark Protocol.
+A Kotlin Multiplatform SDK for building Android, iOS and Desktop Bitcoin wallets for smooth off-chain transactions using Ark Protocol.
 
 ## Modules
- - `arkade` : The core Arkade types and utilities for the Ark protocol
- - `app`: The sample app for reference
+ - **arkade**
+    
+    *Packages*    
+        
+    - `core`: The core Arkade types and utilities for the Ark protocol
+
+ - **app**: The sample app for reference
