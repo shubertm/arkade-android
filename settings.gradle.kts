@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "android-sdk"
+rootProject.name = "kotlin-sdk"
 include(":app")
 include(":arkade")
