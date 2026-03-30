@@ -85,8 +85,8 @@ class ArkadeClientImpl(
                 (msg?.contains("duplicated input") == true) -> {
                     throw LockedVTXOException("VTXO is already locked by another intent")
                 }
-                (msg?.contains("already spent") == true || e.message?.contains("VTXO_ALREADY_SPENT") == true) -> {
-                    throw SpentVTXOException("VTXO input was already spent in a batch: ${e.message}")
+                (msg?.contains("already spent") == true || msg?.contains("VTXO_ALREADY_SPENT") == true) -> {
+                    throw SpentVTXOException("VTXO input was already spent in a batch: $msg")
                 }
                 else -> throw e
             }
@@ -160,8 +160,8 @@ class ArkadeClientImpl(
                     sendChannel.send(request)
                 }
             receiveChannel.consumeEach { response ->
-                when (response) {
-                    response.batch_started -> {
+                when {
+                    response.batch_started != null -> {
                         send(
                             BatchEvent.BatchStartedEvent(
                                 response.batch_started.id,
@@ -170,7 +170,7 @@ class ArkadeClientImpl(
                             ),
                         )
                     }
-                    response.batch_finalization -> {
+                    response.batch_finalization != null -> {
                         send(
                             BatchEvent.BatchFinalizationEvent(
                                 response.batch_finalization.id,
@@ -178,7 +178,7 @@ class ArkadeClientImpl(
                             ),
                         )
                     }
-                    response.batch_finalized -> {
+                    response.batch_finalized != null -> {
                         send(
                             BatchEvent.BatchFinalizedEvent(
                                 response.batch_finalized.id,
@@ -186,7 +186,7 @@ class ArkadeClientImpl(
                             ),
                         )
                     }
-                    response.batch_failed -> {
+                    response.batch_failed != null -> {
                         send(
                             BatchEvent.BatchFailedEvent(
                                 response.batch_failed.id,
@@ -194,7 +194,7 @@ class ArkadeClientImpl(
                             ),
                         )
                     }
-                    response.tree_signing_started -> {
+                    response.tree_signing_started != null -> {
                         send(
                             BatchEvent.TreeSigningStartedEvent(
                                 response.tree_signing_started.id,
@@ -203,7 +203,7 @@ class ArkadeClientImpl(
                             ),
                         )
                     }
-                    response.tree_nonces_aggregated -> {
+                    response.tree_nonces_aggregated != null -> {
                         send(
                             BatchEvent.TreeNoncesAggregatedEvent(
                                 response.tree_nonces_aggregated.id,
@@ -211,7 +211,7 @@ class ArkadeClientImpl(
                             ),
                         )
                     }
-                    response.tree_tx -> {
+                    response.tree_tx != null -> {
                         send(
                             BatchEvent.TreeTxEvent(
                                 response.tree_tx.id,
@@ -223,7 +223,7 @@ class ArkadeClientImpl(
                             ),
                         )
                     }
-                    response.tree_signature -> {
+                    response.tree_signature != null -> {
                         send(
                             BatchEvent.TreeSignatureEvent(
                                 response.tree_signature.id,
@@ -233,7 +233,7 @@ class ArkadeClientImpl(
                             ),
                         )
                     }
-                    response.tree_nonces -> {
+                    response.tree_nonces != null -> {
                         send(
                             BatchEvent.TreeNoncesEvent(
                                 response.tree_nonces.id,
@@ -243,10 +243,10 @@ class ArkadeClientImpl(
                             ),
                         )
                     }
-                    response.heartbeat -> {
+                    response.heartbeat != null -> {
                         send(BatchEvent.HeartbeatEvent())
                     }
-                    response.stream_started -> {
+                    response.stream_started != null -> {
                         send(BatchEvent.StreamStartedEvent(response.stream_started.id))
                     }
                 }
@@ -262,17 +262,17 @@ class ArkadeClientImpl(
                     sendChannel.send(request)
                 }
             receiveChannel.consumeEach { response ->
-                when (response) {
-                    response.commitment_tx -> {
+                when {
+                    response.commitment_tx != null -> {
                         send(TxEvent.CommitmentEvent(response.commitment_tx))
                     }
-                    response.ark_tx -> {
+                    response.ark_tx != null -> {
                         send(TxEvent.ArkEvent(response.ark_tx))
                     }
-                    response.sweep_tx -> {
+                    response.sweep_tx != null -> {
                         send(TxEvent.SweepEvent(response.sweep_tx))
                     }
-                    response.heartbeat -> {
+                    response.heartbeat != null -> {
                         send(TxEvent.HeartbeatEvent())
                     }
                 }
