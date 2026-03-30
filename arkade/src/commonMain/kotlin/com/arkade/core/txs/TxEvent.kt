@@ -15,5 +15,5 @@ sealed interface TxEvent {
         val sweepTx: TxNotification?,
     ) : TxEvent
 
-    class HeartbeatEvent : TxEvent
+    object HeartbeatEvent : TxEvent
 }

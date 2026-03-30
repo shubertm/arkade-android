@@ -244,7 +244,7 @@ class ArkadeClientImpl(
                         )
                     }
                     response.heartbeat != null -> {
-                        send(BatchEvent.HeartbeatEvent())
+                        send(BatchEvent.HeartbeatEvent)
                     }
                     response.stream_started != null -> {
                         send(BatchEvent.StreamStartedEvent(response.stream_started.id))
@@ -273,7 +273,7 @@ class ArkadeClientImpl(
                         send(TxEvent.SweepEvent(response.sweep_tx))
                     }
                     response.heartbeat != null -> {
-                        send(TxEvent.HeartbeatEvent())
+                        send(TxEvent.HeartbeatEvent)
                     }
                 }
             }
