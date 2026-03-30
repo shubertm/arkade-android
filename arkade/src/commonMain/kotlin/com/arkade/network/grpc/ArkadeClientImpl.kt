@@ -83,10 +83,10 @@ class ArkadeClientImpl(
             val msg = e.message
             when {
                 (msg?.contains("duplicated input") == true) -> {
-                    throw LockedVTXOException("VTXO is already locked by another intent")
+                    throw LockedVTXOException("VTXO is already locked by another intent", e)
                 }
                 (msg?.contains("already spent") == true || msg?.contains("VTXO_ALREADY_SPENT") == true) -> {
-                    throw SpentVTXOException("VTXO input was already spent in a batch: $msg")
+                    throw SpentVTXOException("VTXO input was already spent in a batch: $msg", e)
                 }
                 else -> throw e
             }
