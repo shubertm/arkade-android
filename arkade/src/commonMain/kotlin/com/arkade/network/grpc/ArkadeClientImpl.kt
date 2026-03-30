@@ -248,7 +248,7 @@ class ArkadeClientImpl(
                         )
                     }
                     response.heartbeat -> {
-                        send(BatchEvent.Heartbeat())
+                        send(BatchEvent.HeartbeatEvent())
                     }
                     response.stream_started -> {
                         send(BatchEvent.StreamStartedEvent(response.stream_started.id))
@@ -267,14 +267,20 @@ class ArkadeClientImpl(
                     sendChannel.send(request)
                 }
             receiveChannel.consumeEach { response ->
-                send(
-                    TxEvent(
-                        response.commitment_tx,
-                        response.ark_tx,
-                        response.sweep_tx,
-                        response.heartbeat,
-                    ),
-                )
+                when (response) {
+                    response.commitment_tx -> {
+                        send(TxEvent.CommitmentEvent(response.commitment_tx))
+                    }
+                    response.ark_tx -> {
+                        send(TxEvent.ArkEvent(response.ark_tx))
+                    }
+                    response.sweep_tx -> {
+                        send(TxEvent.SweepEvent(response.sweep_tx))
+                    }
+                    response.heartbeat -> {
+                        send(TxEvent.HeartbeatEvent())
+                    }
+                }
             }
         }
     }

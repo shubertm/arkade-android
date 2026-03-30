@@ -58,7 +58,7 @@ sealed interface BatchEvent {
         val treeNonces: Map<String, String>,
     ) : BatchEvent
 
-    class Heartbeat : BatchEvent
+    class HeartbeatEvent : BatchEvent
 
     class StreamStartedEvent(
         val id: String,
