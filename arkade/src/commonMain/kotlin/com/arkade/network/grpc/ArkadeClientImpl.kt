@@ -27,8 +27,7 @@ import com.arkade.network.ArkadeClient
 import com.arkade.network.Config
 import com.squareup.wire.GrpcClient
 import com.squareup.wire.bidirectionalStream
-import fr.acinq.bitcoin.ByteVector32
-import fr.acinq.bitcoin.XonlyPublicKey
+import fr.acinq.bitcoin.PublicKey
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
@@ -43,10 +42,11 @@ class ArkadeClientImpl(
 
     override suspend fun getInfo(): ArkServerInfo {
         val infoResponse = arkadeServiceClient.GetInfo().execute(GetInfoRequest())
+
         return ArkServerInfo(
             infoResponse.version,
-            XonlyPublicKey(ByteVector32.fromValidHex(infoResponse.signer_pubkey)),
-            XonlyPublicKey(ByteVector32.fromValidHex(infoResponse.forfeit_pubkey)),
+            PublicKey.fromHex(infoResponse.signer_pubkey).xOnly(),
+            PublicKey.fromHex(infoResponse.forfeit_pubkey).xOnly(),
             Address.decode(infoResponse.forfeit_address),
             infoResponse.checkpoint_tapscript,
             Network.fromString(infoResponse.network),

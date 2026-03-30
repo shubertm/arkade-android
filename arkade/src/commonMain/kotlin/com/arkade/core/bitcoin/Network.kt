@@ -11,6 +11,7 @@ enum class Network {
         fun fromString(network: String): Network =
             when (network.lowercase()) {
                 "mainnet" -> MAINNET
+                "bitcoin" -> MAINNET
                 "testnet" -> TESTNET
                 "signet" -> SIGNET
                 "regtest" -> REGTEST
