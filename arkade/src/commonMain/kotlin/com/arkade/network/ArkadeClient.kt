@@ -4,8 +4,8 @@ import ark.v1.PendingTx
 import ark.v1.SubmitTxResponse
 import com.arkade.core.ArkServerInfo
 import com.arkade.core.batches.BatchEvent
+import com.arkade.core.intents.ArkIntent
 import com.arkade.core.txs.TxEvent
-import com.arkade.intents.ArkIntent
 import kotlinx.coroutines.flow.Flow
 
 interface ArkadeClient {

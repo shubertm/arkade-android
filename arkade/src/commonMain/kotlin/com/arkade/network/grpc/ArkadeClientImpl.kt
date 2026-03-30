@@ -21,8 +21,8 @@ import com.arkade.core.SpentVTXOException
 import com.arkade.core.batches.BatchEvent
 import com.arkade.core.bitcoin.Address
 import com.arkade.core.bitcoin.Network
+import com.arkade.core.intents.ArkIntent
 import com.arkade.core.txs.TxEvent
-import com.arkade.intents.ArkIntent
 import com.arkade.network.ArkadeClient
 import com.arkade.network.Config
 import com.squareup.wire.GrpcClient
@@ -70,8 +70,7 @@ class ArkadeClientImpl(
 
     override suspend fun registerIntent(intent: ArkIntent): String {
         try {
-            val intent = Intent(intent.registerProof, intent.registerProofMessage)
-            val intentRequest = RegisterIntentRequest(intent)
+            val intentRequest = RegisterIntentRequest(intent.toIntent())
             val intentResponse =
                 arkadeServiceClient
                     .RegisterIntent()
@@ -101,7 +100,7 @@ class ArkadeClientImpl(
 
     override suspend fun deleteIntent(intent: ArkIntent) {
         arkadeServiceClient.DeleteIntent().execute(
-            DeleteIntentRequest(Intent(intent.registerProof, intent.registerProofMessage)),
+            DeleteIntentRequest(intent.toIntent()),
         )
     }
 
