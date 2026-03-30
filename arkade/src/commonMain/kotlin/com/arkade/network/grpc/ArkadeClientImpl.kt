@@ -77,8 +77,8 @@ class ArkadeClientImpl(
                     .RegisterIntent()
                     .execute(intentRequest)
             return intentResponse.intent_id
-        } catch (_: CancellationException) {
-            return ""
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             val msg = e.message
             when {
