@@ -30,9 +30,6 @@ import com.squareup.wire.bidirectionalStream
 import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.XonlyPublicKey
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -154,12 +151,11 @@ class ArkadeClientImpl(
     }
 
     override fun getBatchEventStream(): Flow<BatchEvent> {
-        val scope = CoroutineScope(Dispatchers.IO)
         val request = GetEventStreamRequest()
         return channelFlow {
             val receiveChannel =
                 arkadeServiceClient.GetEventStream().bidirectionalStream(
-                    scope,
+                    this,
                 ) { sendChannel, _ ->
                     sendChannel.send(request)
                 }
@@ -259,11 +255,10 @@ class ArkadeClientImpl(
     }
 
     override fun getTransactionsStream(): Flow<TxEvent> {
-        val scope = CoroutineScope(Dispatchers.IO)
         val request = GetTransactionsStreamRequest()
         return channelFlow {
             val receiveChannel =
-                arkadeServiceClient.GetTransactionsStream().bidirectionalStream(scope) { sendChannel, _ ->
+                arkadeServiceClient.GetTransactionsStream().bidirectionalStream(this) { sendChannel, _ ->
                     sendChannel.send(request)
                 }
             receiveChannel.consumeEach { response ->
