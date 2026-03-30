@@ -48,7 +48,7 @@ sealed interface BatchEvent {
         val id: String,
         val batchIndex: Int,
         val txId: String,
-        topic: List<String>,
+        val topic: List<String>,
     ) : BatchEvent
 
     class TreeNoncesEvent(

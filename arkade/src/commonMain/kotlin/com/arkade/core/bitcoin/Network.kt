@@ -9,7 +9,7 @@ enum class Network {
 
     companion object {
         fun fromString(network: String): Network =
-            when (network) {
+            when (network.lowercase()) {
                 "mainnet" -> MAINNET
                 "testnet" -> TESTNET
                 "signet" -> SIGNET

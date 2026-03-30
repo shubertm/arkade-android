@@ -38,7 +38,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlin.time.Duration.Companion.seconds
 
-class ArkServiceClientImpl(
+class ArkadeClientImpl(
     netConfig: Config,
 ) : ArkadeClient {
     private val grpcClient = gRPCClient(netConfig.arkadeUrl)
@@ -177,16 +177,16 @@ class ArkServiceClientImpl(
                     response.batch_finalization -> {
                         send(
                             BatchEvent.BatchFinalizationEvent(
-                                response.batch_finalization.commitment_tx,
                                 response.batch_finalization.id,
+                                response.batch_finalization.commitment_tx,
                             ),
                         )
                     }
                     response.batch_finalized -> {
                         send(
                             BatchEvent.BatchFinalizedEvent(
-                                response.batch_finalized.commitment_txid,
                                 response.batch_finalized.id,
+                                response.batch_finalized.commitment_txid,
                             ),
                         )
                     }

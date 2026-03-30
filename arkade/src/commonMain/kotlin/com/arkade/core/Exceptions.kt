@@ -1,9 +1,9 @@
 package com.arkade.core
 
-data class LockedVTXOException(
+class LockedVTXOException(
     override val message: String,
 ) : Exception(message)
 
-data class SpentVTXOException(
+class SpentVTXOException(
     override val message: String,
 ) : Exception(message)
