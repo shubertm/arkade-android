@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import org.gradle.kotlin.dsl.support.serviceOf
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -107,6 +108,14 @@ kotlin {
         }
     }
 }
+
+val execOps: ExecOperations = project.serviceOf()
+
+tasks.register<SetupTestTask>("testSetup")
+
+tasks.register<UpDockerTestTask>("testUpDocker")
+
+tasks.register<DownDockerTestTask>("testDownDocker")
 
 tasks.androidPreBuild.dependsOn("ktlintCheck")
 tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")

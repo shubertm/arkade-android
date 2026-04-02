@@ -12,6 +12,7 @@ bitcoinKmp = "0.29.0"
 secp256k1Kmp = "0.22.0"
 ktlintGradlePlugin = "14.0.1"
 kotlinStdlib = "2.3.10"
+kotlinCoroutines = "1.10.2"
 kotlinTest = "2.3.10"
 runner = "1.5.2"
 core = "1.5.0"
@@ -20,6 +21,7 @@ activityCompose = "1.13.0"
 composeBom = "2025.07.00"
 kotlinSerialization = "1.10.0"
 squareWire = "6.1.0"
+jetbrainsKotlinJvm = "2.3.10"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +42,8 @@ secp256k1-kmp-jni-jvm-macos = { module = "fr.acinq.secp256k1:secp256k1-kmp-jni-j
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlinStdlib" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlinTest" }
 kotlinx-serialization-protobuf = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-protobuf", version.ref = "kotlinSerialization" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerialization" }
+kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinCoroutines" }
 androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
@@ -68,5 +72,6 @@ android-lint = { id = "com.android.lint", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 square-wire = { id = "com.squareup.wire", version.ref = "squareWire" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 
 
