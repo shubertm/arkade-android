@@ -13,7 +13,10 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Duration
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toDuration
 
 abstract class SetupTestTask: DefaultTask() {
 
@@ -21,7 +24,7 @@ abstract class SetupTestTask: DefaultTask() {
     abstract val execOps : ExecOperations
 
     @Internal
-    val arkdExec = listOf("docker", "exec", "-t", "arkd")
+    val arkdExec = listOf("docker", "exec", "arkd")
     suspend fun setupArkServer() {
         logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         logger.quiet("Setting up Ark server")
@@ -31,25 +34,27 @@ abstract class SetupTestTask: DefaultTask() {
         if (walletStatus.first && walletStatus.second && walletStatus.third) {
             logger.quiet(" ✔ Wallet ready and synced")
         } else {
-            logger.quiet("Creating ark wallet...")
+            if (!walletStatus.first) {
+                logger.quiet("Creating ark wallet...")
 
-            execOps.exec {
-                val arkdExec = arkdExec.toMutableList()
-                arkdExec.addAll(listOf("arkd", "wallet", "create", "--password", "secret"))
-                commandLine(arkdExec)
-                standardOutput = ByteArrayOutputStream()
+                execOps.exec {
+                    val arkdExec = arkdExec.toMutableList()
+                    arkdExec.addAll(listOf("arkd", "wallet", "create", "--password", "secret"))
+                    commandLine(arkdExec)
+                    standardOutput = ByteArrayOutputStream()
+                }
+                logger.quiet("✔ Wallet created")
             }
-            logger.quiet("✔ Wallet created")
-
-            logger.quiet("\nUnlocking ark wallet...")
-            execOps.exec {
-                val arkdExec = arkdExec.toMutableList()
-                arkdExec.addAll(listOf("arkd", "wallet", "unlock", "--password", "secret"))
-                commandLine(arkdExec)
-                standardOutput = ByteArrayOutputStream()
+            if (!walletStatus.second) {
+                logger.quiet("\nUnlocking ark wallet...")
+                execOps.exec {
+                    val arkdExec = arkdExec.toMutableList()
+                    arkdExec.addAll(listOf("arkd", "wallet", "unlock", "--password", "secret"))
+                    commandLine(arkdExec)
+                    standardOutput = ByteArrayOutputStream()
+                }
+                logger.quiet("✔ Wallet unlocked")
             }
-            logger.quiet("✔ Wallet unlocked")
-
             waitForWalletReadiness()
         }
 
@@ -69,6 +74,7 @@ abstract class SetupTestTask: DefaultTask() {
                 arkdExec.addAll(listOf("arkd", "wallet", "status"))
                 commandLine(arkdExec)
                 standardOutput = outputStream
+                isIgnoreExitValue = true
             }
 
             val status = outputStream.toString().trim()
@@ -107,6 +113,7 @@ abstract class SetupTestTask: DefaultTask() {
     suspend fun waitForArkServer(maxRetries: Int = 30, retryDelay: Long = 2000): String {
         val client = HttpClient.newHttpClient()
         val request = HttpRequest.newBuilder()
+            .timeout(Duration.ofSeconds(2))
             .uri(
                 URI.create("http://localhost:7070/v1/info")
             ).build()
@@ -127,10 +134,9 @@ abstract class SetupTestTask: DefaultTask() {
 
             if (i < maxRetries - 1) {
                 logger.quiet("Waiting... (${i + 1}/$maxRetries)")
-            }
-
-            withContext(Dispatchers.IO) {
-                Thread.sleep(retryDelay)
+                withContext(Dispatchers.IO) {
+                    Thread.sleep(retryDelay)
+                }
             }
         }
         throw Exception("ark server failed to be ready after maximum retries")
