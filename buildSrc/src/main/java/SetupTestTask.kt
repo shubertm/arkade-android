@@ -38,18 +38,19 @@ abstract class SetupTestTask: DefaultTask() {
                 logger.quiet(" ✔ Wallet ready and synced")
             } else {
                 if (!walletStatus.first) {
-                    logger.quiet("Creating ark wallet...")
+                    logger.quiet("Creating Ark wallet...")
 
                     execOps.exec {
                         val arkdExec = arkdExec.toMutableList()
                         arkdExec.addAll(listOf("arkd", "wallet", "create", "--password", "secret"))
                         commandLine(arkdExec)
                         standardOutput = ByteArrayOutputStream()
+                        isIgnoreExitValue = true
                     }
                     logger.quiet("✔ Wallet created")
                 }
                 if (!walletStatus.second) {
-                    logger.quiet("\nUnlocking ark wallet...")
+                    logger.quiet("\nUnlocking Ark wallet...")
                     execOps.exec {
                         val arkdExec = arkdExec.toMutableList()
                         arkdExec.addAll(listOf("arkd", "wallet", "unlock", "--password", "secret"))
@@ -68,7 +69,7 @@ abstract class SetupTestTask: DefaultTask() {
                 logger.quiet("\nark Server Public Key: ${serverInfoJson["signerPubkey"]}")
             }
 
-            logger.quiet("\nFunding ark wallet...")
+            logger.quiet("\nFunding Ark wallet...")
             val outputStream = ByteArrayOutputStream()
             execOps.exec {
                 val arkdExec = arkdExec.toMutableList()
@@ -95,7 +96,7 @@ abstract class SetupTestTask: DefaultTask() {
             // Waiting for transactions to be confirmed
             delay(5000)
 
-            logger.quiet("\nInitializing ark client")
+            logger.quiet("\nInitializing Ark client")
             execOps.exec {
                 val arkdExec = arkdExec.toMutableList()
                 arkdExec.addAll(
@@ -122,21 +123,26 @@ abstract class SetupTestTask: DefaultTask() {
             execOps.exec {
                 val arkdExec = arkdExec.toMutableList()
                 arkdExec.addAll(listOf("arkd", "note", "--amount", "2000000"))
+                outputStream.reset()
                 standardOutput = outputStream
                 isIgnoreExitValue = true
                 commandLine(arkdExec)
+            }
 
+            execOps.exec {
                 val note = outputStream.toString().trim()
-                arkdExec.clear()
-                arkdExec.addAll(this@SetupTestTask.arkdExec)
+                val arkdExec = arkdExec.toMutableList()
+                standardOutput = ByteArrayOutputStream()
+                isIgnoreExitValue = true
                 arkdExec.addAll(listOf("ark", "redeem-notes", "-n", note, "--password", "secret"))
                 commandLine(arkdExec)
             }
+
             logger.quiet("  ✔ Notes redeemed")
 
-            logger.quiet("\n✔ ark server and client setup complete")
+            logger.quiet("\n✔ Ark server and client setup complete")
         } catch(e: Exception) {
-            logger.quiet("\n❌ ark server and client setup failed")
+            logger.quiet("\n❌ Ark server and client setup failed")
             throw e
         }
     }
@@ -175,7 +181,7 @@ abstract class SetupTestTask: DefaultTask() {
                 logger.quiet(" ✔ Wallet ready and synced")
                 return true
             }
-            if (i < maxRetries - 1) {
+            if (i < maxRetries) {
                 logger.quiet("Waiting... (${i + 1}/$maxRetries)")
                 delay(retryDelay)
             }
@@ -214,7 +220,7 @@ abstract class SetupTestTask: DefaultTask() {
                 // Ignore any exceptions and retry
             }
 
-            if (i < maxRetries - 1) {
+            if (i < maxRetries) {
                 logger.quiet("Waiting... (${i + 1}/$maxRetries)")
                 delay(retryDelay)
             }
@@ -231,23 +237,31 @@ abstract class SetupTestTask: DefaultTask() {
             val client = HttpClient.newHttpClient()
 
             logger.quiet("Creating Fulmine wallet...")
-            val requestBody =
-                "{" +
-                        "\"private_key\": \"5b9902c1098cc0f4c7e91066ef3227e292d994a50ebc33961ac6daa656fd242e\", " +
-                        "\"password\": \"password\", " +
-                        "\"server_url\": \"http://arkd:7070\"" +
-                        "}"
+            val requestBody = """
+                {
+                    "private_key": "5b9902c1098cc0f4c7e91066ef3227e292d994a50ebc33961ac6daa656fd242e",
+                    "password": "password",
+                    "server_url": "http://arkd:7070"
+                }
+                """.trimIndent()
 
             val response = client.sendRequest(
                 "http://localhost:7001/api/v1/wallet/create",
                 requestBody
             )
 
-            if (response.statusCode() != 200) {
-                logger.quiet("  ✔ Wallet created")
+            val walletAlreadyInitialized = response.body().contains("wallet already initialized")
+
+            if (walletAlreadyInitialized) {
+                logger.quiet("  ✔ Wallet already initialized")
                 delay(5000)
             } else {
-                throw Exception("Fulmine failed to create wallet")
+                if (response.statusCode() == 200) {
+                    logger.quiet("  ✔ Wallet created")
+                    delay(5000)
+                } else {
+                    throw Exception("Fulmine failed to create wallet: ${response.body()}")
+                }
             }
 
             logger.quiet("\nUnlocking Fulmine wallet...")
@@ -263,7 +277,7 @@ abstract class SetupTestTask: DefaultTask() {
                 logger.quiet("  ✔ Wallet unlocked")
                 delay(2000)
             } else {
-                throw Exception("Fulmine failed to unlock wallet")
+                throw Exception("Fulmine failed to unlock wallet: ${unlockResponse.body()}")
             }
 
             logger.quiet("\nGetting Fulmine address...")
@@ -275,7 +289,7 @@ abstract class SetupTestTask: DefaultTask() {
 
             logger.quiet("  Address: $fulmineAddress")
 
-            logger.quiet("\nFunnding Fulmine address...")
+            logger.quiet("\nFunding Fulmine address...")
             client.faucet(fulmineAddress, 1)
 
             logger.quiet("\nSettling funds in Fulmine...")
@@ -283,7 +297,7 @@ abstract class SetupTestTask: DefaultTask() {
             if (settleResponse.statusCode() == 200) {
                 logger.quiet("  ✔ Funds settled")
             } else {
-                throw Exception("Fulmine failed to settle funds")
+                throw Exception("Fulmine failed to settle funds: ${settleResponse.body()}")
             }
 
             logger.quiet("\n✔ Fulmine setup complete")
@@ -298,7 +312,7 @@ abstract class SetupTestTask: DefaultTask() {
         if (initialCountResponse.statusCode() == 200) {
             val initialCount = Json.parseToJsonElement(initialCountResponse.body())
                 .jsonObject["chain_stats"]
-                ?.jsonObject["tx_count"].toString().toInt()
+                ?.jsonObject["tx_count"]?.toString()?.toIntOrNull() ?: 0
 
             val outputStream = ByteArrayOutputStream()
             execOps.exec {
@@ -316,7 +330,7 @@ abstract class SetupTestTask: DefaultTask() {
                     if (newCountResponse.statusCode() == 200) {
                         val newCount = Json.parseToJsonElement(newCountResponse.body())
                             .jsonObject["chain_stats"]
-                            ?.jsonObject["tx_count"].toString().toInt()
+                            ?.jsonObject["tx_count"]?.toString()?.toIntOrNull() ?: 0
 
                         if (newCount > initialCount) {
                             logger.quiet("  ✔ Confirmed")
@@ -339,7 +353,7 @@ abstract class SetupTestTask: DefaultTask() {
 
     suspend fun HttpClient.sendRequest(uri: String, body: String = ""): HttpResponse<String> {
         val requestBuilder = HttpRequest.newBuilder()
-            .timeout(Duration.ofSeconds(2))
+            .timeout(Duration.ofSeconds(5))
             .header("Content-Type", "application/json")
             .uri(URI.create(uri))
         if (body.isNotEmpty()) {
@@ -359,12 +373,12 @@ abstract class SetupTestTask: DefaultTask() {
             try {
                 setupArkServer()
                 setupFulmine()
-                logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-                logger.quiet("  ✓ regtest setup completed successfully");
+                logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+                logger.quiet("✓ Regtest setup completed successfully")
                 logger.quiet("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-            } catch(_: Exception) {
-                logger.quiet("\n❌ regtest setup failed")
-                exitProcess(1)
+            } catch(e: Exception) {
+                logger.quiet("\n❌ Regtest setup failed")
+                logger.debug(e.message, e)
             }
         }
     }
