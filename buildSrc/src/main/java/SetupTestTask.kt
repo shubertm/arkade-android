@@ -191,18 +191,11 @@ abstract class SetupTestTask: DefaultTask() {
 
     suspend fun waitForArkServer(maxRetries: Int = 30, retryDelay: Long = 2000): String {
         val client = HttpClient.newHttpClient()
-        val request = HttpRequest.newBuilder()
-            .timeout(Duration.ofSeconds(2))
-            .uri(
-                URI.create("http://localhost:7070/v1/info")
-            ).build()
 
         logger.quiet("\nWaiting for ark server to be ready...")
         for (i in 0 .. maxRetries) {
             try {
-                val response = withContext(Dispatchers.IO) {
-                    client.send(request, HttpResponse.BodyHandlers.ofString())
-                }
+                val response = client.sendRequest("http://localhost:7070/v1/info")
                 val responseBody = response.body().trim()
 
                 if (response.statusCode() == 200 && responseBody.isNotEmpty() && !responseBody.contains("server not ready")) {
@@ -320,7 +313,7 @@ abstract class SetupTestTask: DefaultTask() {
                 isIgnoreExitValue = true
                 commandLine("nigiri", "faucet", address, amount.toString())
             }
-            val txId = outputStream.toString().trim()
+            val txId = outputStream.toString().split(":")[1].trim()
             logger.quiet("  Transaction ID: $txId")
 
             repeat(maxRetries) { i ->
