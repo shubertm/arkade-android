@@ -1,5 +1,4 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
-import org.gradle.kotlin.dsl.support.serviceOf
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -108,8 +107,6 @@ kotlin {
         }
     }
 }
-
-val execOps: ExecOperations = project.serviceOf()
 
 tasks.register<SetupTestTask>("testSetup")
 
