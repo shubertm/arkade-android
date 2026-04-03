@@ -1,3 +1,4 @@
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -85,9 +86,7 @@ abstract class SetupTestTask: DefaultTask() {
                 val isSynced = status.contains("synced: true")
                 return Triple(isInitialized, isUnlocked, isSynced)
             }
-            withContext(Dispatchers.IO) {
-                Thread.sleep(retryDelay)
-            }
+            delay(retryDelay)
         }
         return Triple(false, false, false)
     }
@@ -95,16 +94,14 @@ abstract class SetupTestTask: DefaultTask() {
     suspend fun waitForWalletReadiness(maxRetries: Int = 30, retryDelay: Long = 2000): Boolean {
         logger.quiet("\nWaiting for wallet to be ready and synced...")
         for (i in 0 .. maxRetries) {
-            val status = checkWalletStatus()
+            val status = checkWalletStatus(0)
             if (status.first && status.second && status.third) {
                 logger.quiet(" ✔ Wallet ready and synced")
                 return true
             }
             if (i < maxRetries - 1) {
                 logger.quiet("Waiting... (${i + 1}/$maxRetries)")
-                withContext(Dispatchers.IO) {
-                    Thread.sleep(retryDelay)
-                }
+                delay(retryDelay)
             }
         }
         throw Exception("wallet failed to be ready after maximum retries")
@@ -130,13 +127,20 @@ abstract class SetupTestTask: DefaultTask() {
                     logger.quiet(" ✔ Server ready")
                     return responseBody
                 }
-            } catch (_: Exception) {}
+            } catch (e: InterruptedException) {
+                Thread.currentThread().interrupt()
+                throw e
+            }
+            catch (e: CancellationException) {
+                throw e
+            }
+            catch (_: Exception) {
+                // Ignore any exceptions and retry
+            }
 
             if (i < maxRetries - 1) {
                 logger.quiet("Waiting... (${i + 1}/$maxRetries)")
-                withContext(Dispatchers.IO) {
-                    Thread.sleep(retryDelay)
-                }
+                delay(retryDelay)
             }
         }
         throw Exception("ark server failed to be ready after maximum retries")
