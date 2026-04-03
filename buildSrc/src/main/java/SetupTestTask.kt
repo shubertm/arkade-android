@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
@@ -120,7 +121,7 @@ abstract class SetupTestTask: DefaultTask() {
 
             logger.quiet("\nCreating and redeeming notes")
 
-            execOps.exec {
+            val noteResult = execOps.exec {
                 val arkdExec = arkdExec.toMutableList()
                 arkdExec.addAll(listOf("arkd", "note", "--amount", "2000000"))
                 outputStream.reset()
@@ -129,13 +130,27 @@ abstract class SetupTestTask: DefaultTask() {
                 commandLine(arkdExec)
             }
 
-            execOps.exec {
-                val note = outputStream.toString().trim()
+            if (noteResult.exitValue != 0) {
+                throw Exception("Failed to create note")
+            }
+
+
+            val note = outputStream.toString().trim()
+
+            if (note.isEmpty()) {
+                throw Exception("Failed to create note: empty note")
+            }
+
+            val redeemResult = execOps.exec {
                 val arkdExec = arkdExec.toMutableList()
                 standardOutput = ByteArrayOutputStream()
                 isIgnoreExitValue = true
                 arkdExec.addAll(listOf("ark", "redeem-notes", "-n", note, "--password", "secret"))
                 commandLine(arkdExec)
+            }
+
+            if (redeemResult.exitValue != 0) {
+                throw Exception("Failed to redeem note")
             }
 
             logger.quiet("  ✔ Notes redeemed")
@@ -176,8 +191,11 @@ abstract class SetupTestTask: DefaultTask() {
     suspend fun waitForWalletReadiness(maxRetries: Int = 30, retryDelay: Long = 2000): Boolean {
         logger.quiet("\nWaiting for wallet to be ready and synced...")
         for (i in 0 .. maxRetries) {
-            val status = checkWalletStatus(0)
-            if (status.first && status.second && status.third) {
+            val status = try {
+                checkWalletStatus(0)
+            } catch (_: Exception) { null }
+
+            if (status?.first == true && status.second && status.third) {
                 logger.quiet(" ✔ Wallet ready and synced")
                 return true
             }
@@ -278,7 +296,9 @@ abstract class SetupTestTask: DefaultTask() {
             val fulmineAddressResponse = client.sendRequest("http://localhost:7001/api/v1/address")
             val fulmineAddressJsonResponse = Json.parseToJsonElement(fulmineAddressResponse.body())
             val fulmineAddress = fulmineAddressJsonResponse.jsonObject["address"]
-                .toString().split("?")[0].split(":")[1]
+                ?.jsonPrimitive?.content
+                ?.split("?")[0]?.split(":")[1]
+                ?: throw IllegalStateException("Fulmine address missing or invalid: ${fulmineAddressResponse.body()}")
 
             logger.quiet("  Address: $fulmineAddress")
 
@@ -372,6 +392,7 @@ abstract class SetupTestTask: DefaultTask() {
             } catch(e: Exception) {
                 logger.quiet("\n❌ Regtest setup failed")
                 logger.debug(e.message, e)
+                exitProcess(1)
             }
         }
     }
