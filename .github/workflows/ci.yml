@@ -1,0 +1,41 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run linter
+        run: ./gradlew lint
+
+      - name: Run Unit Tests
+        run: ./gradlew :arkade:cleanJvmTest :arkade:jvmTest --tests "com.arkade.core.*"
+
+      - name: Run Nigiri
+        uses: vulpemventures/nigiri-github-action@v1
+        with:
+          use_liquid: false
+          use_ln: false
+
+      - name: Build arkd master
+        run: ./gradlew buildDocker
+
+      - name: Run arkd master
+        run: ./gradlew testE2EDocker
+
+      - name: Capture arkd logs
+        if: failure()
+        run: |
+          docker logs arkd > arkd.log || true
+          if [ -f arkd.log ]; then
+            echo "=== arkd logs ==="
+            cat arkd.log
+          fi
+
