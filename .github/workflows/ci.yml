@@ -24,9 +24,6 @@ jobs:
           use_liquid: false
           use_ln: false
 
-      - name: Build arkd master
-        run: ./gradlew buildDocker
-
       - name: Run arkd master
         run: ./gradlew testE2EDocker
 
