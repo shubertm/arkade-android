@@ -121,5 +121,7 @@ tasks.register<E2ETestTask>("testE2EDocker") {
     finalizedBy("testDownDocker")
 }
 
+tasks.register<BuildDockerTestTask>("buildDocker")
+
 tasks.androidPreBuild.dependsOn("ktlintCheck")
 tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")
