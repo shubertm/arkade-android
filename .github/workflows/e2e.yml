@@ -20,10 +20,10 @@ jobs:
           java-version: '17'
 
       - name: Run linter
-        run: ./gradlew lint
+        run: ./gradlew lint --no-daemon
 
       - name: Run Unit Tests
-        run: ./gradlew :arkade:cleanJvmTest :arkade:jvmTest --tests "com.arkade.core.*"
+        run: ./gradlew :arkade:cleanJvmTest :arkade:jvmTest --tests "com.arkade.core.*" --no-daemon
 
       - name: Run Nigiri
         uses: vulpemventures/nigiri-github-action@v1
@@ -32,7 +32,7 @@ jobs:
           use_ln: false
 
       - name: Run arkd master
-        run: ./gradlew testE2EDocker
+        run: ./gradlew testE2EDocker --no-daemon
 
       - name: Capture arkd logs
         if: failure()
