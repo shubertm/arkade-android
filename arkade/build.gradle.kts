@@ -109,5 +109,14 @@ kotlin {
     }
 }
 
+tasks.register<SetupTestTask>("testSetup") {
+    dependsOn("testUpDocker")
+    finalizedBy("testDownDocker")
+}
+
+tasks.register<UpDockerTestTask>("testUpDocker")
+
+tasks.register<DownDockerTestTask>("testDownDocker")
+
 tasks.androidPreBuild.dependsOn("ktlintCheck")
 tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")
