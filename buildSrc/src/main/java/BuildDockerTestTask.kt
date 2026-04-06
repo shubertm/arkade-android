@@ -15,11 +15,15 @@ abstract class BuildDockerTestTask: DefaultTask() {
         logger.quiet("Building docker containers")
         logger.quiet("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
 
-        execOps.exec {
+        val result = execOps.exec {
             workingDir = project.rootDir
             standardOutput = ByteArrayOutputStream()
             isIgnoreExitValue = true
-            commandLine(        "docker", "compose", "-f", "docker-compose.yml", "build", "--no-cache")
+            commandLine("docker", "compose", "-f", "docker-compose.yml", "build", "--no-cache")
+        }
+
+        if (result.exitValue != 0) {
+            throw Exception("Docker build failed with exit code: ${result.exitValue}")
         }
 
         logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")

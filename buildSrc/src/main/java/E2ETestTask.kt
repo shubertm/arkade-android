@@ -15,11 +15,15 @@ abstract class E2ETestTask: DefaultTask() {
         logger.quiet("Running all e2e tests")
         logger.quiet("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
 
-        execOps.exec {
+        val result = execOps.exec {
             workingDir = project.rootDir
             standardOutput = ByteArrayOutputStream()
             isIgnoreExitValue = true
             commandLine("./gradlew", "cleanJvmTest", "jvmTest", "--tests", "com.arkade.e2e.*")
+        }
+
+        if (result.exitValue != 0) {
+            throw Exception("E2E tests failed with exit code: ${result.exitValue}")
         }
 
         logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
