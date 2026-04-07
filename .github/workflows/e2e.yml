@@ -14,7 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/setup-java@v5
+      - name: Setup JDK 17
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -30,6 +31,9 @@ jobs:
         with:
           use_liquid: false
           use_ln: false
+
+      - name: Build docker images
+        run: ./gradlew buildDocker --no-daemon
 
       - name: Run arkd master
         run: ./gradlew testE2EDocker --no-daemon

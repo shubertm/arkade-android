@@ -19,7 +19,7 @@ abstract class E2ETestTask: DefaultTask() {
             workingDir = project.rootDir
             standardOutput = ByteArrayOutputStream()
             isIgnoreExitValue = true
-            commandLine("./gradlew", "cleanJvmTest", "jvmTest", "--tests", "com.arkade.e2e.*")
+            commandLine("./gradlew", "cleanJvmTest", "jvmTest", "--tests", "com.arkade.e2e.*", "--no-daemon")
         }
 
         if (result.exitValue != 0) {

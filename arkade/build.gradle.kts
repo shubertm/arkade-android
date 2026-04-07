@@ -112,9 +112,7 @@ tasks.register<SetupTestTask>("testSetup") {
     dependsOn("testUpDocker")
 }
 
-tasks.register<UpDockerTestTask>("testUpDocker") {
-    dependsOn("buildDocker")
-}
+tasks.register<UpDockerTestTask>("testUpDocker")
 
 tasks.register<DownDockerTestTask>("testDownDocker")
 
