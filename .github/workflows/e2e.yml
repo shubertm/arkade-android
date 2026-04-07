@@ -32,10 +32,10 @@ jobs:
           use_liquid: false
           use_ln: false
 
-      - name: Build docker images
+      - name: Build Docker Images
         run: ./gradlew buildDocker --no-daemon
 
-      - name: Run arkd master
+      - name: Run E2E Tests
         run: ./gradlew testE2EDocker --no-daemon
 
       - name: Capture arkd logs
