@@ -205,7 +205,7 @@ abstract class SetupTestTask: DefaultTask() {
                 delay(retryDelay)
             }
         }
-        throw GradleException("wallet failed to be ready after maximum retries")
+        throw GradleException("Wallet failed to be ready after maximum retries")
     }
 
     suspend fun waitForArkServer(maxRetries: Int = 30, retryDelay: Long = 2000): String {
@@ -237,7 +237,7 @@ abstract class SetupTestTask: DefaultTask() {
                 delay(retryDelay)
             }
         }
-        throw GradleException("ark server failed to be ready after maximum retries")
+        throw GradleException("Ark server failed to be ready after maximum retries")
     }
 
     suspend fun setupFulmine() {
@@ -350,8 +350,6 @@ abstract class SetupTestTask: DefaultTask() {
                             logger.quiet("  ✔ Confirmed")
                             return txId
                         }
-                    } else {
-                        throw GradleException("Failed to get new faucet count: ${newCountResponse.body()}")
                     }
                 } catch (_: Exception) { /* Ignore and retry */
                 }
