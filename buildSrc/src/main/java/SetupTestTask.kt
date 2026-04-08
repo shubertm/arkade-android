@@ -186,7 +186,7 @@ abstract class SetupTestTask: DefaultTask() {
                 delay(retryDelay)
             }
         }
-        throw IllegalStateException("Wallet status check failed after $maxRetries retries")
+        throw GradleException("Wallet status check failed after $maxRetries retries")
     }
 
     suspend fun waitForWalletReadiness(maxRetries: Int = 30, retryDelay: Long = 2000): Boolean {
@@ -299,7 +299,7 @@ abstract class SetupTestTask: DefaultTask() {
             val fulmineAddress = fulmineAddressJsonResponse.jsonObject["address"]
                 ?.jsonPrimitive?.content
                 ?.split("?")[0]?.split(":")[1]
-                ?: throw IllegalStateException("Fulmine address missing or invalid: ${fulmineAddressResponse.body()}")
+                ?: throw GradleException("Fulmine address missing or invalid: ${fulmineAddressResponse.body()}")
 
             logger.quiet("  Address: $fulmineAddress")
 
