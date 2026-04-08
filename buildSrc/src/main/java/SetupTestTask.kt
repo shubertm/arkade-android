@@ -306,6 +306,8 @@ abstract class SetupTestTask: DefaultTask() {
             logger.quiet("\nFunding Fulmine address...")
             client.faucet(fulmineAddress, 1)
 
+            delay(5000)
+
             logger.quiet("\nSettling funds in Fulmine...")
             val settleResponse = client.sendRequest("http://localhost:7001/api/v1/settle")
             if (settleResponse.statusCode() == 200) {
