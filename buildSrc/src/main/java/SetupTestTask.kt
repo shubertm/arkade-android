@@ -8,6 +8,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
@@ -131,14 +132,14 @@ abstract class SetupTestTask: DefaultTask() {
             }
 
             if (noteResult.exitValue != 0) {
-                throw Exception("Failed to create note")
+                throw GradleException("Failed to create note")
             }
 
 
             val note = outputStream.toString().trim()
 
             if (note.isEmpty()) {
-                throw Exception("Failed to create note: empty note")
+                throw GradleException("Failed to create note: empty note")
             }
 
             val redeemResult = execOps.exec {
@@ -150,7 +151,7 @@ abstract class SetupTestTask: DefaultTask() {
             }
 
             if (redeemResult.exitValue != 0) {
-                throw Exception("Failed to redeem note")
+                throw GradleException("Failed to redeem note")
             }
 
             logger.quiet("  ✔ Notes redeemed")
@@ -204,7 +205,7 @@ abstract class SetupTestTask: DefaultTask() {
                 delay(retryDelay)
             }
         }
-        throw Exception("wallet failed to be ready after maximum retries")
+        throw GradleException("wallet failed to be ready after maximum retries")
     }
 
     suspend fun waitForArkServer(maxRetries: Int = 30, retryDelay: Long = 2000): String {
@@ -236,7 +237,7 @@ abstract class SetupTestTask: DefaultTask() {
                 delay(retryDelay)
             }
         }
-        throw Exception("ark server failed to be ready after maximum retries")
+        throw GradleException("ark server failed to be ready after maximum retries")
     }
 
     suspend fun setupFulmine() {
@@ -271,7 +272,7 @@ abstract class SetupTestTask: DefaultTask() {
                     logger.quiet("  ✔ Wallet created")
                     delay(5000)
                 } else {
-                    throw Exception("Fulmine failed to create wallet: ${response.body()}")
+                    throw GradleException("Fulmine failed to create wallet: ${response.body()}")
                 }
             }
 
@@ -288,7 +289,7 @@ abstract class SetupTestTask: DefaultTask() {
                 logger.quiet("  ✔ Wallet unlocked")
                 delay(2000)
             } else {
-                throw Exception("Fulmine failed to unlock wallet: ${unlockResponse.body()}")
+                throw GradleException("Fulmine failed to unlock wallet: ${unlockResponse.body()}")
             }
 
             logger.quiet("\nGetting Fulmine address...")
@@ -310,7 +311,7 @@ abstract class SetupTestTask: DefaultTask() {
             if (settleResponse.statusCode() == 200) {
                 logger.quiet("  ✔ Funds settled")
             } else {
-                throw Exception("Fulmine failed to settle funds: ${settleResponse.body()}")
+                throw GradleException("Fulmine failed to settle funds: ${settleResponse.body()}")
             }
 
             logger.quiet("\n✔ Fulmine setup complete")
@@ -350,7 +351,7 @@ abstract class SetupTestTask: DefaultTask() {
                             return txId
                         }
                     } else {
-                        throw Exception("Failed to get new faucet count: ${newCountResponse.body()}")
+                        throw GradleException("Failed to get new faucet count: ${newCountResponse.body()}")
                     }
                 } catch (_: Exception) { /* Ignore and retry */
                 }
@@ -358,9 +359,9 @@ abstract class SetupTestTask: DefaultTask() {
                     logger.quiet("  Waiting for confirmation ($i/$maxRetries)...")
                 }
             }
-            throw Exception("Timed out waiting for faucet transaction to confirm.")
+            throw GradleException("Timed out waiting for faucet transaction to confirm.")
         } else {
-            throw Exception("Failed to get initial faucet count: ${initialCountResponse.body()}")
+            throw GradleException("Failed to get initial faucet count: ${initialCountResponse.body()}")
         }
     }
 

@@ -1,4 +1,5 @@
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
@@ -23,7 +24,7 @@ abstract class BuildDockerTestTask: DefaultTask() {
         }
 
         if (result.exitValue != 0) {
-            throw Exception("Docker build failed with exit code: ${result.exitValue}")
+            throw GradleException("Docker build failed with exit code: ${result.exitValue}")
         }
 
         logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
