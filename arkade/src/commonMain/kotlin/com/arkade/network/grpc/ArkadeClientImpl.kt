@@ -33,6 +33,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Implementation of [ArkadeClient] using gRPC
+ * @param netConfig is the network configuration
+ */
 class ArkadeClientImpl(
     netConfig: Config,
 ) : ArkadeClient {
@@ -286,4 +290,9 @@ class ArkadeClientImpl(
     }
 }
 
+/**
+ * Creates a gRPC client from the provided service url
+ * @param baseUrl is the gRPC service url
+ * @return a gRPC client
+ */
 expect fun gRPCClient(baseUrl: String): GrpcClient

@@ -2,6 +2,9 @@ package com.arkade.core.intents
 
 import ark.v1.Intent
 
+/**
+ * Intent used to register an intent with the Ark server
+ */
 data class ArkIntent(
     val id: String,
     val txId: String,

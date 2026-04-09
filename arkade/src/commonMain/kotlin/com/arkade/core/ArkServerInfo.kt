@@ -8,6 +8,9 @@ import com.arkade.core.bitcoin.Network
 import fr.acinq.bitcoin.XonlyPublicKey
 import kotlin.time.Duration
 
+/**
+ * All information about the Ark server
+ */
 data class ArkServerInfo(
     val version: String,
     val signerPubKey: XonlyPublicKey,
