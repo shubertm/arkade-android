@@ -37,6 +37,7 @@ class ArkadeClientImpl(
     netConfig: Config,
 ) : ArkadeClient {
     private val grpcClient = gRPCClient(netConfig.arkadeUrl)
+
     private val arkadeServiceClient = GrpcArkServiceClient(grpcClient)
 
     override suspend fun getInfo(): ArkServerInfo {
