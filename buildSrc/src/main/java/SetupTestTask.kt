@@ -341,6 +341,8 @@ abstract class SetupTestTask: DefaultTask() {
             val txId = outputStream.toString().split(":")[1].trim()
             logger.quiet("  Transaction ID: $txId")
 
+            var timeoutMessage = ""
+
             repeat(maxRetries) { i ->
                 delay(retryDelay)
                 try {
@@ -354,6 +356,10 @@ abstract class SetupTestTask: DefaultTask() {
                             logger.quiet("  ✔ Confirmed")
                             return txId
                         }
+                    } else {
+                        if (i == maxRetries) {
+                            timeoutMessage = newCountResponse.body()
+                        }
                     }
                 } catch (_: Exception) { /* Ignore and retry */
                 }
@@ -361,7 +367,7 @@ abstract class SetupTestTask: DefaultTask() {
                     logger.quiet("  Waiting for confirmation ($i/$maxRetries)...")
                 }
             }
-            throw GradleException("Timed out waiting for faucet transaction to confirm.")
+            throw GradleException("Timed out waiting for faucet transaction to confirm: $timeoutMessage")
         } else {
             throw GradleException("Failed to get initial faucet count: ${initialCountResponse.body()}")
         }
