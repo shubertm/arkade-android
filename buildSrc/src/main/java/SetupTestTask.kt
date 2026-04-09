@@ -357,13 +357,13 @@ abstract class SetupTestTask: DefaultTask() {
                             return txId
                         }
                     } else {
-                        if (i == maxRetries) {
+                        if (i == maxRetries - 1) {
                             timeoutMessage = newCountResponse.body()
                         }
                     }
                 } catch (_: Exception) { /* Ignore and retry */
                 }
-                if (i < maxRetries) {
+                if (i < maxRetries - 1) {
                     logger.quiet("  Waiting for confirmation ($i/$maxRetries)...")
                 }
             }
