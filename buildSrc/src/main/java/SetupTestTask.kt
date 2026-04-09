@@ -298,7 +298,9 @@ abstract class SetupTestTask: DefaultTask() {
             val fulmineAddressJsonResponse = Json.parseToJsonElement(fulmineAddressResponse.body())
             val fulmineAddress = fulmineAddressJsonResponse.jsonObject["address"]
                 ?.jsonPrimitive?.content
-                ?.split("?")[0]?.split(":")[1]
+                ?.substringBefore("?")
+                ?.substringAfter(":", missingDelimiterValue = "")
+                ?.takeIf { it.isNotBlank() }
                 ?: throw GradleException("Fulmine address missing or invalid: ${fulmineAddressResponse.body()}")
 
             logger.quiet("  Address: $fulmineAddress")
