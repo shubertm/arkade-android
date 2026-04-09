@@ -8,7 +8,6 @@ import ark.v1.GetInfoRequest
 import ark.v1.GetPendingTxRequest
 import ark.v1.GetTransactionsStreamRequest
 import ark.v1.GrpcArkServiceClient
-import ark.v1.Intent
 import ark.v1.PendingTx
 import ark.v1.RegisterIntentRequest
 import ark.v1.SubmitSignedForfeitTxsRequest
@@ -280,7 +279,7 @@ class ArkadeClientImpl(
     }
 
     override suspend fun getPendingTxs(intent: ArkIntent): List<PendingTx> {
-        val request = GetPendingTxRequest(Intent(intent.registerProof, intent.registerProofMessage))
+        val request = GetPendingTxRequest(intent.toIntent())
         val response = arkadeServiceClient.GetPendingTx().execute(request)
         return response.pending_txs
     }
