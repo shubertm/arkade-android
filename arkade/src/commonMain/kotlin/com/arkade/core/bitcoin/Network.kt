@@ -5,4 +5,17 @@ enum class Network {
     TESTNET,
     SIGNET,
     REGTEST,
+    ;
+
+    companion object {
+        fun fromString(network: String): Network =
+            when (network.lowercase()) {
+                "mainnet" -> MAINNET
+                "bitcoin" -> MAINNET
+                "testnet" -> TESTNET
+                "signet" -> SIGNET
+                "regtest" -> REGTEST
+                else -> throw IllegalArgumentException("Invalid network: $network")
+            }
+    }
 }
