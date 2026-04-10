@@ -132,7 +132,7 @@ class OnChainTaprootAddressTest {
     @Test
     fun regtest_fail_creating_address_on_malformed_script_pubkey() {
         assertFailsWith<IllegalArgumentException> {
-            Address.fromScriptPubKey(malformedScriptPubKey, Network.TESTNET)
+            Address.fromScriptPubKey(malformedScriptPubKey, Network.REGTEST)
         }
     }
 
