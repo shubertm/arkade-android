@@ -59,18 +59,17 @@ class OnChainTaprootAddressTest {
     @Test
     fun testnet_round_trip() {
         val network = Network.TESTNET
-        val scriptPubKey = "512095f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5".hexToByteArray()
 
         val decoded = Address.decode(testnetAddress)
 
         assertEquals("tb", decoded.hrp.prefix)
         assertEquals(WitnessVersion.TAPROOT, decoded.witnessVersion)
-        assertEquals("95f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5", decoded.witnessProgram.toHexString())
+        assertEquals(witnessProgram, decoded.witnessProgram.toHexString())
 
         val fromScriptPubKey = Address.fromScriptPubKey(scriptPubKey, network)
         assertEquals("tb", fromScriptPubKey.hrp.prefix)
         assertEquals(WitnessVersion.TAPROOT, fromScriptPubKey.witnessVersion)
-        assertEquals("95f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5", fromScriptPubKey.witnessProgram.toHexString())
+        assertEquals(witnessProgram, fromScriptPubKey.witnessProgram.toHexString())
 
         val encoded = decoded.encode()
         assertEquals(testnetAddress, encoded)
@@ -100,18 +99,17 @@ class OnChainTaprootAddressTest {
     @Test
     fun regtest_round_trip() {
         val network = Network.REGTEST
-        val scriptPubKey = "512095f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5".hexToByteArray()
 
         val decoded = Address.decode(regtestAddress)
 
         assertEquals("bcrt", decoded.hrp.prefix)
         assertEquals(WitnessVersion.TAPROOT, decoded.witnessVersion)
-        assertEquals("95f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5", decoded.witnessProgram.toHexString())
+        assertEquals(witnessProgram, decoded.witnessProgram.toHexString())
 
         val fromScriptPubKey = Address.fromScriptPubKey(scriptPubKey, network)
         assertEquals("bcrt", fromScriptPubKey.hrp.prefix)
         assertEquals(WitnessVersion.TAPROOT, fromScriptPubKey.witnessVersion)
-        assertEquals("95f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5", fromScriptPubKey.witnessProgram.toHexString())
+        assertEquals(witnessProgram, fromScriptPubKey.witnessProgram.toHexString())
 
         val encoded = decoded.encode()
         assertEquals(regtestAddress, encoded)
