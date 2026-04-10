@@ -12,22 +12,24 @@ class OnChainTaprootAddressTest {
     val mainnetAddress = "bc1pjhe7sjma3rnkdfelsrj5l6g58z9ysclkrjxgy0duxcp9k6r9atjst0yf78"
     val testnetAddress = "tb1pjhe7sjma3rnkdfelsrj5l6g58z9ysclkrjxgy0duxcp9k6r9atjsu8jxyg"
     val regtestAddress = "bcrt1pjhe7sjma3rnkdfelsrj5l6g58z9ysclkrjxgy0duxcp9k6r9atjs37cq3j"
+    val witnessProgram = "95f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5"
+    val scriptPubKey = "512095f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5".hexToByteArray()
+    val malformedScriptPubKey = "511495f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5".hexToByteArray()
 
     @Test
     fun mainnet_round_trip() {
         val network = Network.MAINNET
-        val scriptPubKey = "512095f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5".hexToByteArray()
 
         val decoded = Address.decode(mainnetAddress)
 
         assertEquals("bc", decoded.hrp.prefix)
         assertEquals(WitnessVersion.TAPROOT, decoded.witnessVersion)
-        assertEquals("95f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5", decoded.witnessProgram.toHexString())
+        assertEquals(witnessProgram, decoded.witnessProgram.toHexString())
 
         val fromScriptPubKey = Address.fromScriptPubKey(scriptPubKey, network)
         assertEquals("bc", fromScriptPubKey.hrp.prefix)
         assertEquals(WitnessVersion.TAPROOT, fromScriptPubKey.witnessVersion)
-        assertEquals("95f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5", fromScriptPubKey.witnessProgram.toHexString())
+        assertEquals(witnessProgram, fromScriptPubKey.witnessProgram.toHexString())
 
         val encoded = decoded.encode()
         assertEquals(mainnetAddress, encoded)
@@ -44,6 +46,13 @@ class OnChainTaprootAddressTest {
                 WitnessVersion.TAPROOT,
                 decoded.witnessProgram.copyOfRange(3, 16),
             )
+        }
+    }
+
+    @Test
+    fun mainnet_fail_creating_address_on_malformed_script_pubkey() {
+        assertFailsWith<IllegalArgumentException> {
+            Address.fromScriptPubKey(malformedScriptPubKey, Network.MAINNET)
         }
     }
 
@@ -82,6 +91,13 @@ class OnChainTaprootAddressTest {
     }
 
     @Test
+    fun testnet_fail_creating_address_on_malformed_script_pubkey() {
+        assertFailsWith<IllegalArgumentException> {
+            Address.fromScriptPubKey(malformedScriptPubKey, Network.TESTNET)
+        }
+    }
+
+    @Test
     fun regtest_round_trip() {
         val network = Network.REGTEST
         val scriptPubKey = "512095f3e84b7d88e766a73f80e54fe914388a4863f61c8c823dbc36025b6865eae5".hexToByteArray()
@@ -112,6 +128,13 @@ class OnChainTaprootAddressTest {
                 WitnessVersion.TAPROOT,
                 decoded.witnessProgram.copyOfRange(3, 16),
             )
+        }
+    }
+
+    @Test
+    fun regtest_fail_creating_address_on_malformed_script_pubkey() {
+        assertFailsWith<IllegalArgumentException> {
+            Address.fromScriptPubKey(malformedScriptPubKey, Network.TESTNET)
         }
     }
 
@@ -129,6 +152,7 @@ class OnChainSegwitAddressTest {
     val regtestAddress = "bcrt1q6jktr35gzw37e7gh96fkm5w8qp256f8qlm7cpj"
     val witnessProgram = "d4acb1c68813a3ecf9172e936dd1c700554d24e0"
     val scriptPubKey = "0014d4acb1c68813a3ecf9172e936dd1c700554d24e0".hexToByteArray()
+    val malformedScriptPubKey = "0020d4acb1c68813a3ecf9172e936dd1c700554d24e0".hexToByteArray()
 
     @Test
     fun mainnet_round_trip() {
@@ -160,6 +184,13 @@ class OnChainSegwitAddressTest {
                 WitnessVersion.SEGWIT,
                 decoded.witnessProgram.copyOfRange(3, 16),
             )
+        }
+    }
+
+    @Test
+    fun mainnet_fail_creating_address_on_malformed_script_pubkey() {
+        assertFailsWith<IllegalArgumentException> {
+            Address.fromScriptPubKey(malformedScriptPubKey, Network.MAINNET)
         }
     }
 
@@ -197,6 +228,13 @@ class OnChainSegwitAddressTest {
     }
 
     @Test
+    fun testnet_fail_creating_address_on_malformed_script_pubkey() {
+        assertFailsWith<IllegalArgumentException> {
+            Address.fromScriptPubKey(malformedScriptPubKey, Network.TESTNET)
+        }
+    }
+
+    @Test
     fun regtest_round_trip() {
         val network = Network.REGTEST
 
@@ -226,6 +264,13 @@ class OnChainSegwitAddressTest {
                 WitnessVersion.SEGWIT,
                 decoded.witnessProgram.copyOfRange(3, 16),
             )
+        }
+    }
+
+    @Test
+    fun regtest_fail_creating_address_on_malformed_script_pubkey() {
+        assertFailsWith<IllegalArgumentException> {
+            Address.fromScriptPubKey(malformedScriptPubKey, Network.REGTEST)
         }
     }
 

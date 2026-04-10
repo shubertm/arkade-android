@@ -95,11 +95,14 @@ data class Address(
         ): Address {
             val scriptPubKeySize = scriptPubKey.size
             require(scriptPubKeySize == 34 || scriptPubKeySize == 22) {
-                "Invalid scriptPubKey length, expected 34 bytes but got $scriptPubKeySize"
+                "Invalid scriptPubKey length, expected 22 or 34 bytes but got $scriptPubKeySize"
             }
             val witnessProgramPushByte = scriptPubKey[1]
+            require(witnessProgramPushByte.toInt() == scriptPubKeySize - 2) {
+                "Invalid witness program push length, expected $witnessProgramPushByte but got ${scriptPubKeySize - 2}"
+            }
             require(witnessProgramPushByte == 0x20.toByte() || witnessProgramPushByte == 0x14.toByte()) {
-                "Invalid witness program push length, expected 0x20 but got $witnessProgramPushByte"
+                "Invalid witness program push length, expected 0x20 or 0x14 but got $witnessProgramPushByte"
             }
             val witnessVersion = WitnessVersion.fromByte(scriptPubKey[0])
             require(witnessVersion == WitnessVersion.SEGWIT || witnessVersion == WitnessVersion.TAPROOT) {
