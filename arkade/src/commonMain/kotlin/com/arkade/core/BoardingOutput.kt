@@ -7,7 +7,6 @@ import com.arkade.core.bitcoin.Utxo
 import com.arkade.core.taproot.Parity
 import com.arkade.core.taproot.TaprootSpendingInfo
 import fr.acinq.bitcoin.ByteVector
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.ScriptTree
@@ -145,7 +144,7 @@ data class BoardingOutput(
                 )
             val merkleRoot = merkleTree.hash()
 
-            val internalKey = XonlyPublicKey(ByteVector32.fromValidHex(UNSPENDABLE_PUBKEY))
+            val internalKey = UNSPENDABLE_PUBKEY.toXOnlyPubKey()
             val (outputKey, isOdd) = internalKey.outputKey(merkleTree)
             val spendingInfo =
                 TaprootSpendingInfo(

@@ -7,7 +7,6 @@ import com.arkade.core.taproot.Parity
 import com.arkade.core.taproot.TaprootSpendingInfo
 import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import fr.acinq.bitcoin.ByteVector
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.ScriptTree
@@ -170,7 +169,7 @@ data class Vtxo(
         ): Vtxo {
             require(exitDelay in 0..0xFFFFL) { "Exit delay time is out of range" }
             require(tapScripts.size == 2) { "Expects exactly 2 tap scripts: forfeit and exit" }
-            val unSpendablePubKey = XonlyPublicKey(ByteVector32.fromValidHex(UNSPENDABLE_PUBKEY))
+            val unSpendablePubKey = UNSPENDABLE_PUBKEY.toXOnlyPubKey()
 
             val (forfeitScript, exitScript) = tapScripts
             val forfeitLeaf = ScriptTree.Leaf(ByteVector(forfeitScript), 0)
