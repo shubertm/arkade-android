@@ -94,18 +94,18 @@ data class Address(
             network: Network,
         ): Address {
             val scriptPubKeySize = scriptPubKey.size
-            require(scriptPubKeySize == 34) {
+            require(scriptPubKeySize == 34 || scriptPubKeySize == 22) {
                 "Invalid scriptPubKey length, expected 34 bytes but got $scriptPubKeySize"
             }
             val witnessProgramPushByte = scriptPubKey[1]
-            require(witnessProgramPushByte == 0x20.toByte()) {
+            require(witnessProgramPushByte == 0x20.toByte() || witnessProgramPushByte == 0x14.toByte()) {
                 "Invalid witness program push length, expected 0x20 but got $witnessProgramPushByte"
             }
             val witnessVersion = WitnessVersion.fromByte(scriptPubKey[0])
             require(witnessVersion == WitnessVersion.SEGWIT || witnessVersion == WitnessVersion.TAPROOT) {
                 "Unsupported witness version"
             }
-            val witnessProgram = scriptPubKey.copyOfRange(2, 34)
+            val witnessProgram = scriptPubKey.copyOfRange(2, scriptPubKeySize)
             val hrp = Hrp.fromNetwork(network)
             return Address(
                 hrp,
