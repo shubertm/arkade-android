@@ -14,28 +14,17 @@ abstract class UnitTestTask: Test() {
             excludeTestsMatching("com.arkade.e2e.*")
             includeTestsMatching("*")
         }
-    }
 
-    @TaskAction
-    fun run() {
-        logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        logger.quiet("Running all unit tests")
-        logger.quiet("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
-
-        val outputStream = ByteArrayOutputStream()
-        val result = execOps.exec {
-            workingDir = project.rootDir
-            standardOutput = outputStream
-            isIgnoreExitValue = true
-            commandLine("./gradlew", ":arkade:cleanJvmTest", ":arkade:jvmTest", "--no-daemon")
+        doFirst {
+            logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            logger.quiet("Running all unit tests")
+            logger.quiet("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
         }
 
-        if (result.exitValue != 0) {
-            throw GradleException("Unit tests failed with exit code: ${result.exitValue}\n$outputStream")
+        doLast {
+            logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+            logger.quiet("✓ All unit tests passed")
+            logger.quiet("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
         }
-
-        logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        logger.quiet("✓ All unit tests passed")
-        logger.quiet("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
     }
 }
