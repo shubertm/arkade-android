@@ -1,4 +1,4 @@
-name: E2E Test
+name: E2E Tests
 
 on:
   push:
@@ -20,11 +20,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
       - name: Run linter
         run: ./gradlew lint --no-daemon
-
-      - name: Run Unit Tests
-        run: ./gradlew :arkade:cleanJvmTest :arkade:jvmTest --tests "com.arkade.core.*" --no-daemon
 
       - name: Run Nigiri
         uses: vulpemventures/nigiri-github-action@v1

@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import org.gradle.kotlin.dsl.commonTest
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -123,6 +124,15 @@ tasks.register<E2ETestTask>("testE2EDocker") {
 }
 
 tasks.register<BuildDockerTestTask>("buildDocker")
+
+tasks.register<UnitTestTask>("testUnit") {
+    val test =
+        project.extensions
+            .getByType(SourceSetContainer::class.java)
+            .getByName("jvmTest")
+    testClassesDirs = test.output.classesDirs
+    classpath = test.runtimeClasspath
+}
 
 tasks.androidPreBuild.dependsOn("ktlintCheck")
 tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")
