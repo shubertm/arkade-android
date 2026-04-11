@@ -190,86 +190,94 @@ class ArkadeClientImpl(
         val response = arkadeServiceClient.GetPendingTx().execute(request)
         return response.pending_txs
     }
-
-    private fun GetEventStreamResponse.getBatchEvent(): BatchEvent? =
-        when {
-            batch_started != null ->
-                BatchEvent.BatchStartedEvent(
-                    batch_started.id,
-                    batch_started.batch_expiry.seconds,
-                    batch_started.intent_id_hashes,
-                )
-            batch_finalization != null ->
-                BatchEvent.BatchFinalizationEvent(
-                    batch_finalization.id,
-                    batch_finalization.commitment_tx,
-                )
-            batch_finalized != null ->
-                BatchEvent.BatchFinalizedEvent(
-                    batch_finalized.id,
-                    batch_finalized.commitment_txid,
-                )
-            batch_failed != null ->
-                BatchEvent.BatchFailedEvent(
-                    batch_failed.id,
-                    batch_failed.reason,
-                )
-            tree_signing_started != null ->
-                BatchEvent.TreeSigningStartedEvent(
-                    tree_signing_started.id,
-                    tree_signing_started.cosigners_pubkeys,
-                    tree_signing_started.unsigned_commitment_tx,
-                )
-            tree_nonces_aggregated != null ->
-                BatchEvent.TreeNoncesAggregatedEvent(
-                    tree_nonces_aggregated.id,
-                    tree_nonces_aggregated.tree_nonces,
-                )
-            tree_tx != null ->
-                BatchEvent.TreeTxEvent(
-                    tree_tx.id,
-                    tree_tx.batch_index,
-                    tree_tx.tx,
-                    tree_tx.txid,
-                    tree_tx.children,
-                    tree_tx.topic,
-                )
-            tree_signature != null ->
-                BatchEvent.TreeSignatureEvent(
-                    tree_signature.id,
-                    tree_signature.batch_index,
-                    tree_signature.txid,
-                    tree_signature.topic,
-                )
-            tree_nonces != null ->
-                BatchEvent.TreeNoncesEvent(
-                    tree_nonces.id,
-                    tree_nonces.txid,
-                    tree_nonces.topic,
-                    tree_nonces.nonces,
-                )
-            heartbeat != null -> BatchEvent.HeartbeatEvent
-            stream_started != null -> BatchEvent.StreamStartedEvent(stream_started.id)
-            else -> null
-        }
-
-    private fun GetTransactionsStreamResponse.getTxEvent(): TxEvent? =
-        when {
-            commitment_tx != null -> {
-                TxEvent.CommitmentEvent(commitment_tx)
-            }
-            ark_tx != null -> {
-                TxEvent.ArkEvent(ark_tx)
-            }
-            sweep_tx != null -> {
-                TxEvent.SweepEvent(sweep_tx)
-            }
-            heartbeat != null -> {
-                TxEvent.HeartbeatEvent
-            }
-            else -> null
-        }
 }
+
+/**
+ * Translates an event stream response to a [BatchEvent]
+ * @return a [BatchEvent] or null if the response is not a batch event
+ */
+internal fun GetEventStreamResponse.getBatchEvent(): BatchEvent? =
+    when {
+        batch_started != null ->
+            BatchEvent.BatchStartedEvent(
+                batch_started.id,
+                batch_started.batch_expiry.seconds,
+                batch_started.intent_id_hashes,
+            )
+        batch_finalization != null ->
+            BatchEvent.BatchFinalizationEvent(
+                batch_finalization.id,
+                batch_finalization.commitment_tx,
+            )
+        batch_finalized != null ->
+            BatchEvent.BatchFinalizedEvent(
+                batch_finalized.id,
+                batch_finalized.commitment_txid,
+            )
+        batch_failed != null ->
+            BatchEvent.BatchFailedEvent(
+                batch_failed.id,
+                batch_failed.reason,
+            )
+        tree_signing_started != null ->
+            BatchEvent.TreeSigningStartedEvent(
+                tree_signing_started.id,
+                tree_signing_started.cosigners_pubkeys,
+                tree_signing_started.unsigned_commitment_tx,
+            )
+        tree_nonces_aggregated != null ->
+            BatchEvent.TreeNoncesAggregatedEvent(
+                tree_nonces_aggregated.id,
+                tree_nonces_aggregated.tree_nonces,
+            )
+        tree_tx != null ->
+            BatchEvent.TreeTxEvent(
+                tree_tx.id,
+                tree_tx.batch_index,
+                tree_tx.tx,
+                tree_tx.txid,
+                tree_tx.children,
+                tree_tx.topic,
+            )
+        tree_signature != null ->
+            BatchEvent.TreeSignatureEvent(
+                tree_signature.id,
+                tree_signature.batch_index,
+                tree_signature.txid,
+                tree_signature.topic,
+            )
+        tree_nonces != null ->
+            BatchEvent.TreeNoncesEvent(
+                tree_nonces.id,
+                tree_nonces.txid,
+                tree_nonces.topic,
+                tree_nonces.nonces,
+            )
+        heartbeat != null -> BatchEvent.HeartbeatEvent
+        stream_started != null -> BatchEvent.StreamStartedEvent(stream_started.id)
+        else -> null
+    }
+
+/**
+ * Translates a transaction stream response to a [TxEvent]
+ * @return a [TxEvent] or null if the response is not a transaction event
+ */
+internal fun GetTransactionsStreamResponse.getTxEvent(): TxEvent? =
+    when {
+        commitment_tx != null -> {
+            TxEvent.CommitmentEvent(commitment_tx)
+        }
+        ark_tx != null -> {
+            TxEvent.ArkEvent(ark_tx)
+        }
+        sweep_tx != null -> {
+            TxEvent.SweepEvent(sweep_tx)
+        }
+        heartbeat != null -> {
+            TxEvent.HeartbeatEvent
+        }
+        else -> null
+    }
 
 /**
  * Creates a gRPC client from the provided service url

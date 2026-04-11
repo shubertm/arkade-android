@@ -36,9 +36,7 @@ jobs:
         run: ./gradlew buildDocker --no-daemon
 
       - name: Run E2E Tests
-        run: |
-          ./gradlew testDownDocker --no-daemon
-          ./gradlew testE2EDocker --no-daemon
+        run: ./gradlew testE2EDocker --no-daemon
 
       - name: Capture arkd logs
         if: failure()
