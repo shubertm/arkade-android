@@ -78,7 +78,7 @@ services:
         environment:
             - ARKD_LOG_LEVEL=6
             - ARKD_NO_MACAROONS=true
-            - ARKD_VTXO_TREE_EXPIRY=20
+            - ARKD_VTXO_TREE_EXPIRY=40
             - ARKD_SCHEDULER_TYPE=block
             - ARKD_UNILATERAL_EXIT_DELAY=20
             - ARKD_CHECKPOINT_EXIT_DELAY=10
