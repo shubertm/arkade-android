@@ -4,21 +4,19 @@ import com.arkade.core.bitcoin.Address
 import com.arkade.core.bitcoin.Network
 import com.arkade.core.taproot.Parity
 import fr.acinq.bitcoin.ByteVector
-import fr.acinq.bitcoin.ByteVector32
 import fr.acinq.bitcoin.Crypto
-import fr.acinq.bitcoin.PublicKey
 import fr.acinq.bitcoin.Script
 import fr.acinq.bitcoin.ScriptTree
-import fr.acinq.bitcoin.XonlyPublicKey
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class BoardingOutputTest {
+    val serverPubKey = "03a19310a999207dbd9a03d20f649e37c7a578a07d75e6fa19aa3f33fc6b15622c".toXOnlyPubKey()
+    val ownerPubKey = "0315fbe13a8cf7e4d0c81b0caf4040f37666933d97080abb04f908964bb14588a8".toXOnlyPubKey()
+    val unSpendablePubKey = UNSPENDABLE_PUBKEY.toXOnlyPubKey()
+
     @Test
     fun mainnet_should_succeed_on_creating_boarding_output() {
-        val serverPubKey = PublicKey.fromHex("03a19310a999207dbd9a03d20f649e37c7a578a07d75e6fa19aa3f33fc6b15622c").xOnly()
-        val ownerPubKey = PublicKey.fromHex("0315fbe13a8cf7e4d0c81b0caf4040f37666933d97080abb04f908964bb14588a8").xOnly()
-
         val boardingOutput =
             BoardingOutput.create(
                 serverPubKey,
@@ -37,7 +35,6 @@ class BoardingOutputTest {
         val scriptTree = ScriptTree.Branch(forfeitLeaf, exitLeaf)
         val merkleRoot = scriptTree.hash()
 
-        val unSpendablePubKey = XonlyPublicKey(ByteVector32.fromValidHex(UNSPENDABLE_PUBKEY))
         val scriptPubKey =
             with(Script) {
                 write(pay2tr(unSpendablePubKey, Crypto.TaprootTweak.ScriptPathTweak(merkleRoot)))
@@ -77,9 +74,6 @@ class BoardingOutputTest {
 
     @Test
     fun testnet_should_succeed_on_creating_boarding_output() {
-        val serverPubKey = PublicKey.fromHex("03a19310a999207dbd9a03d20f649e37c7a578a07d75e6fa19aa3f33fc6b15622c").xOnly()
-        val ownerPubKey = PublicKey.fromHex("0315fbe13a8cf7e4d0c81b0caf4040f37666933d97080abb04f908964bb14588a8").xOnly()
-
         val boardingOutput =
             BoardingOutput.create(
                 serverPubKey,
@@ -98,7 +92,6 @@ class BoardingOutputTest {
         val scriptTree = ScriptTree.Branch(forfeitLeaf, exitLeaf)
         val merkleRoot = scriptTree.hash()
 
-        val unSpendablePubKey = XonlyPublicKey(ByteVector32.fromValidHex(UNSPENDABLE_PUBKEY))
         val scriptPubKey =
             with(Script) {
                 write(pay2tr(unSpendablePubKey, Crypto.TaprootTweak.ScriptPathTweak(merkleRoot)))
@@ -138,9 +131,6 @@ class BoardingOutputTest {
 
     @Test
     fun regtest_should_succeed_on_creating_boarding_output() {
-        val serverPubKey = PublicKey.fromHex("03a19310a999207dbd9a03d20f649e37c7a578a07d75e6fa19aa3f33fc6b15622c").xOnly()
-        val ownerPubKey = PublicKey.fromHex("0315fbe13a8cf7e4d0c81b0caf4040f37666933d97080abb04f908964bb14588a8").xOnly()
-
         val boardingOutput =
             BoardingOutput.create(
                 serverPubKey,
@@ -159,7 +149,6 @@ class BoardingOutputTest {
         val scriptTree = ScriptTree.Branch(forfeitLeaf, exitLeaf)
         val merkleRoot = scriptTree.hash()
 
-        val unSpendablePubKey = XonlyPublicKey(ByteVector32.fromValidHex(UNSPENDABLE_PUBKEY))
         val scriptPubKey =
             with(Script) {
                 write(pay2tr(unSpendablePubKey, Crypto.TaprootTweak.ScriptPathTweak(merkleRoot)))
