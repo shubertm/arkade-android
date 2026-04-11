@@ -1,14 +1,17 @@
 name: Build
 
 on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+  workflow_run:
+    workflows:
+      - Unit Tests
+      - E2E Tests
+    types:
+      - completed
 
 jobs:
   build:
-    needs: [test]
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: [lint, ktlint]
     runs-on: ubuntu-latest
     environment: Development
     steps:
@@ -39,25 +42,6 @@ jobs:
           name: arkade-jvm
           path: ./arkade/build/libs/arkade.jar
           if-no-files-found: error
-
-  test:
-    needs: [lint, ktlint]
-    runs-on: ubuntu-latest
-    environment: Development
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Set Up JDK 17
-        uses: actions/setup-java@v5
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-
-      - name: Run Tests
-        run: ./gradlew allTests
 
   lint:
     environment: Development
