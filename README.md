@@ -47,7 +47,8 @@ The repository is organized into the following modules:
 ### Prerequisites
 - **Kotlin 1.9+**
 - **Gradle 8+**
-- **Docker** (optional, for server and wallet containers)
+- **Nigiri** (for integration tests)
+- **Docker** (for server and wallet containers)
 
 ### Installation
 Clone the repository:
@@ -99,11 +100,15 @@ Please note that this project is **experimental**, so expect frequent changes.
 ./gradlew testUnit
 ```
 ### Integration
+- Install Nigiri
+    ```shell
+    curl https://getnigiri.vulpem.com | bash
+    ```
 - Run Nigiri
     ```shell
     nigiri start
     ``` 
-- Run all tests
+- Run all docker e2e tests
     ```shell 
     ./gradlew testE2EDocker
     ```
