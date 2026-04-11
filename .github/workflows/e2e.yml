@@ -50,6 +50,9 @@ jobs:
       - name: Capture arkd logs
         if: failure()
         run: |
+          docker ps -a
+          docker inspect arkd || true
+          docker logs arkd --tail 50 || tr
           docker logs arkd > arkd.log || true
           if [ -f arkd.log ]; then
             echo "=== arkd logs ==="
