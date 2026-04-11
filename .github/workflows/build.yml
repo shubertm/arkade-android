@@ -1,12 +1,7 @@
 name: Build
 
 on:
-  workflow_run:
-    workflows:
-      - Unit Tests
-      - E2E Tests
-    types:
-      - completed
+  workflow_call:
 
 jobs:
   build:
