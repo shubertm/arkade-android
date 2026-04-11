@@ -93,7 +93,8 @@ Please note that this project is **experimental**, so expect frequent changes.
 ---
 
 ## Testing
-### Unit testing
+
+### Unit
 ```shell
 ./gradlew testUnit
 ```
