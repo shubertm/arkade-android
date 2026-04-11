@@ -2,9 +2,9 @@ name: Unit Tests
 
 on:
  workflow_call:
-   
+   git
 jobs:
-  test:
+  tests:
     runs-on: ubuntu-latest
 
     steps:
