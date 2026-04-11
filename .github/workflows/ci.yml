@@ -11,8 +11,8 @@ on:
 jobs:
   build:
     needs:
-      - unit-tests
-      - e2e-tests
+      - unit
+      - e2e
     uses: ./.github/workflows/build.yml
 
   unit:
