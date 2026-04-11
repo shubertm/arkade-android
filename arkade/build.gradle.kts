@@ -109,13 +109,18 @@ kotlin {
     }
 }
 
-tasks.register<SetupTestTask>("testSetup")
+tasks.register<SetupTestTask>("testSetup") {
+    dependsOn("testUpDocker")
+}
 
 tasks.register<UpDockerTestTask>("testUpDocker")
 
 tasks.register<DownDockerTestTask>("testDownDocker")
 
-tasks.register<E2ETestTask>("testE2EDocker")
+tasks.register<E2ETestTask>("testE2EDocker") {
+    dependsOn("testSetup")
+    finalizedBy("testDownDocker")
+}
 
 tasks.register<BuildDockerTestTask>("buildDocker")
 
