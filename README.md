@@ -1,19 +1,128 @@
 <h1 align="center">Arkade Kotlin Multiplatform SDK</h1>
 <p align="center">
-<a href="https://github.com/shubertm/arkade-android/actions/workflows/build.yml"> 
-<img src="https://github.com/shubertm/arkade-android/actions/workflows/build.yml/badge.svg" alt="build status">
+<a href="https://github.com/shubertm/arkade-kotlin/actions/workflows/build.yml">
+<img src="https://github.com/shubertm/arkade-kotlin/actions/workflows/build.yml/badge.svg" alt="build status">
+</a>
+<a href="https://github.com/shubertm/arkade-kotlin/actions/workflows/unit.yml">
+<img src="https://github.com/shubertm/arkade-kotlin/actions/workflows/unit.yml/badge.svg" alt="unit tests status">
+</a>
+<a href="https://github.com/shubertm/arkade-kotlin/actions/workflows/e2e.yml">
+<img src="https://github.com/shubertm/arkade-kotlin/actions/workflows/e2e.yml/badge.svg" alt="e2e tests status">
 </a>
 </p>
 
-**EXPERIMENTAL!** Do not use in production.
+## Overview
+**Arkade Kotlin** is an **experimental Kotlin Multiplatform SDK** designed for building **Bitcoin wallets** across Android, iOS, and desktop platforms. It leverages the **Ark Protocol** to enable smooth **off-chain transactions**.  
+⚠️ **Note:** This SDK is **not production-ready** and should only be used for experimentation and development purposes.
 
-A Kotlin Multiplatform SDK for building Android, iOS and Desktop Bitcoin wallets for smooth off-chain transactions using Ark Protocol.
+---
 
-## Modules
- - **arkade**
-    
-    *Packages*    
-        
-    - `core`: The core Arkade types and utilities for the Ark protocol
+## Features
+- **Kotlin Multiplatform support**: Works across Android, iOS, and desktop.
+- **Bitcoin wallet integration**: Build wallets with Ark Protocol support.
+- **Off-chain transactions**: Enables fast and efficient transfers.
+- **Sample app included**: Reference implementation to help developers get started.
 
- - **app**: The sample app for reference
+---
+
+## Architecture
+The repository is organized into the following modules:
+
+| Module | Description |
+|--------|-------------|
+| **core** | Core Arkade types and utilities for the Ark Protocol. |
+| **app** | Sample application demonstrating SDK usage. |
+| **buildSrc** | Gradle build configuration and dependencies. |
+| **scripts** | Utility scripts for building and running the project. |
+
+
+<p align="center">
+<img src="./assets/architecture.png" alt="architecture">
+</p>
+
+---
+
+## Getting Started
+
+### Prerequisites
+- **Kotlin 1.9+**
+- **Gradle 8+**
+- **Nigiri** (for integration tests)
+- **Docker** (for server and wallet containers)
+
+### Installation
+Clone the repository:
+```bash
+git clone https://github.com/shubertm/arkade-kotlin.git
+cd arkade-kotlin
+```
+
+Build the project:
+```bash
+./gradlew build
+```
+
+Run the sample app:
+```bash
+./gradlew :app:run
+```
+
+---
+
+## Usage Example
+Here’s a simple example of how to initialize the SDK in Kotlin:
+
+```kotlin
+import arkade.core.Wallet
+
+fun main() {
+    val wallet = Wallet.create("mySeedPhrase")
+    println("Wallet address: ${wallet.address}")
+}
+```
+
+---
+
+## Contributing
+Contributions are welcome!
+- Fork the repo
+- Create a feature branch
+- Submit a pull request
+
+Please note that this project is **experimental**, so expect frequent changes.
+
+---
+
+## Testing
+
+### Unit
+```shell
+./gradlew testUnit
+```
+### Integration
+- Install Nigiri
+    ```shell
+    curl https://getnigiri.vulpem.com | bash
+    ```
+- Run Nigiri
+    ```shell
+    nigiri start
+    ``` 
+- Run all docker e2e tests
+    ```shell 
+    ./gradlew testE2EDocker
+    ```
+- Stop Nigiri
+    ```shell
+    nigiri stop --delete
+    ```
+
+## License
+This project is licensed under the **MIT License**. See the [License](./LICENSE) file for details.
+
+---
+
+## Disclaimer
+This SDK is **experimental** and should **not** be used in production environments. Use at your own risk.
+
+---
