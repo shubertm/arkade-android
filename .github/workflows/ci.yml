@@ -1,0 +1,22 @@
+name: Arkade Kotlin CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    needs:
+      - unit
+      - e2e
+    uses: ./.github/workflows/build.yml
+
+  unit:
+    uses: ./.github/workflows/unit.yml
+
+  e2e:
+    uses: ./.github/workflows/e2e.yml
