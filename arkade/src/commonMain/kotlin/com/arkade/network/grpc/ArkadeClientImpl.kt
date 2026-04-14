@@ -303,13 +303,19 @@ internal fun TxNotification.getNotification(): Notification {
             Transaction(checkpointTx.value.txid, checkpointTx.value.tx)
         }
     val spentVtxos =
-        spent_vtxos.filter { spentVtxo -> spentVtxo.outpoint != null }.map { spentVtxo ->
-            spentVtxo.getVtxoData()
-        }
+        spent_vtxos
+            .filter { spentVtxo ->
+                spentVtxo.outpoint != null && spentVtxo.outpoint.txid.isNotBlank()
+            }.map { spentVtxo ->
+                spentVtxo.getVtxoData()
+            }
     val spendableVtxos =
-        spendable_vtxos.filter { spendableVtxo -> spendableVtxo.outpoint != null }.map { spendableVtxo ->
-            spendableVtxo.getVtxoData()
-        }
+        spendable_vtxos
+            .filter { spendableVtxo ->
+                spendableVtxo.outpoint != null && spendableVtxo.outpoint.txid.isNotBlank()
+            }.map { spendableVtxo ->
+                spendableVtxo.getVtxoData()
+            }
     val sweptVtxos =
         swept_vtxos.filter { outpoint -> outpoint.txid.isNotBlank() }.map { outpoint ->
             OutPoint(TxHash(outpoint.txid), outpoint.vout.toLong())
