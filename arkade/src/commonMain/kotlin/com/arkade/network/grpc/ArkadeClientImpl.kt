@@ -19,6 +19,7 @@ import com.arkade.core.ArkServerInfo
 import com.arkade.core.LockedVTXOException
 import com.arkade.core.SpentVTXOException
 import com.arkade.core.Vtxo
+import com.arkade.core.assets.Asset
 import com.arkade.core.batches.BatchEvent
 import com.arkade.core.bitcoin.Address
 import com.arkade.core.bitcoin.Network
@@ -29,6 +30,7 @@ import com.arkade.core.txs.Transaction
 import com.arkade.core.txs.TxEvent
 import com.arkade.network.ArkadeClient
 import com.arkade.network.Config
+import com.ionspin.kotlin.bignum.decimal.BigDecimal
 import com.squareup.wire.GrpcClient
 import com.squareup.wire.bidirectionalStream
 import fr.acinq.bitcoin.OutPoint
@@ -291,25 +293,28 @@ internal fun GetTransactionsStreamResponse.getTxEvent(): TxEvent? =
         else -> null
     }
 
+/**
+ * Translates a transaction notification to a [Notification]
+ * @return a [Notification]
+ */
 internal fun TxNotification.getNotification(): Notification {
     val checkpointTxs =
         checkpoint_txs.mapValues { checkpointTx ->
             Transaction(checkpointTx.value.txid, checkpointTx.value.tx)
         }
     val spentVtxos =
-        spent_vtxos.map { spentVtxo ->
-            val outpoint = spentVtxo.outpoint?.txid?.let { OutPoint(TxHash(it), spentVtxo.outpoint.vout.toLong()) }
-            Vtxo.Data(outpoint)
+        spent_vtxos.filter { spentVtxo -> spentVtxo.outpoint != null }.map { spentVtxo ->
+            spentVtxo.getVtxoData()
         }
     val spendableVtxos =
-        spendable_vtxos.map { spendableVtxo ->
-            val outpoint = spendableVtxo.outpoint?.txid?.let { OutPoint(TxHash(it), spendableVtxo.outpoint.vout.toLong()) }
-            Vtxo.Data(outpoint)
+        spendable_vtxos.filter { spendableVtxo -> spendableVtxo.outpoint != null }.map { spendableVtxo ->
+            spendableVtxo.getVtxoData()
         }
     val sweptVtxos =
-        swept_vtxos.map { outpoint ->
+        swept_vtxos.filter { outpoint -> outpoint.txid.isNotBlank() }.map { outpoint ->
             OutPoint(TxHash(outpoint.txid), outpoint.vout.toLong())
         }
+
     return Notification(
         txid,
         tx,
@@ -317,6 +322,34 @@ internal fun TxNotification.getNotification(): Notification {
         spentVtxos,
         spendableVtxos,
         sweptVtxos,
+    )
+}
+
+/**
+ * Translates a VTXO from Ark server to [Vtxo.Data]
+ * @return [Vtxo.Data]
+ */
+internal fun ark.v1.Vtxo.getVtxoData(): Vtxo.Data {
+    val outpoint = OutPoint(TxHash(outpoint?.txid!!), outpoint.vout.toLong())
+    val assets =
+        assets.filter { asset -> asset.asset_id.isNotBlank() }.map { asset ->
+            Asset(asset.asset_id, BigDecimal.fromLong(asset.amount))
+        }
+    return Vtxo.Data(
+        outpoint,
+        BigDecimal.fromLong(amount),
+        script,
+        created_at,
+        expires_at,
+        is_preconfirmed,
+        is_swept,
+        is_unrolled,
+        is_spent,
+        spent_by,
+        settled_by,
+        ark_txid,
+        commitment_txids,
+        assets,
     )
 }
 
