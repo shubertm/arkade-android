@@ -10,25 +10,30 @@ import ark.v1.GetPendingTxRequest
 import ark.v1.GetTransactionsStreamRequest
 import ark.v1.GetTransactionsStreamResponse
 import ark.v1.GrpcArkServiceClient
-import ark.v1.PendingTx
 import ark.v1.RegisterIntentRequest
 import ark.v1.SubmitSignedForfeitTxsRequest
 import ark.v1.SubmitTreeNoncesRequest
 import ark.v1.SubmitTreeSignaturesRequest
-import ark.v1.SubmitTxResponse
+import ark.v1.TxNotification
 import com.arkade.core.ArkServerInfo
 import com.arkade.core.LockedVTXOException
 import com.arkade.core.SpentVTXOException
+import com.arkade.core.Vtxo
 import com.arkade.core.batches.BatchEvent
 import com.arkade.core.bitcoin.Address
 import com.arkade.core.bitcoin.Network
 import com.arkade.core.intents.ArkIntent
+import com.arkade.core.txs.ArkTransaction
+import com.arkade.core.txs.Notification
+import com.arkade.core.txs.Transaction
 import com.arkade.core.txs.TxEvent
 import com.arkade.network.ArkadeClient
 import com.arkade.network.Config
 import com.squareup.wire.GrpcClient
 import com.squareup.wire.bidirectionalStream
+import fr.acinq.bitcoin.OutPoint
 import fr.acinq.bitcoin.PublicKey
+import fr.acinq.bitcoin.TxHash
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
@@ -113,9 +118,10 @@ class ArkadeClientImpl(
     override suspend fun submitTransaction(
         signedArkTx: String,
         checkpointTxs: List<String>,
-    ): SubmitTxResponse {
+    ): ArkTransaction {
         val txRequest = ark.v1.SubmitTxRequest(signedArkTx, checkpointTxs)
-        return arkadeServiceClient.SubmitTx().execute(txRequest)
+        val txResponse = arkadeServiceClient.SubmitTx().execute(txRequest)
+        return ArkTransaction.FullySigned(txResponse.ark_txid, txResponse.final_ark_tx, txResponse.signed_checkpoint_txs)
     }
 
     override suspend fun finalizeTransaction(
@@ -185,10 +191,16 @@ class ArkadeClientImpl(
         }
     }
 
-    override suspend fun getPendingTxs(intent: ArkIntent): List<PendingTx> {
+    override suspend fun getPendingTxs(intent: ArkIntent): List<ArkTransaction> {
         val request = GetPendingTxRequest(intent.toIntent())
         val response = arkadeServiceClient.GetPendingTx().execute(request)
-        return response.pending_txs
+        return response.pending_txs.map { pendingTx ->
+            ArkTransaction.Pending(
+                pendingTx.ark_txid,
+                pendingTx.final_ark_tx,
+                pendingTx.signed_checkpoint_txs,
+            )
+        }
     }
 }
 
@@ -265,19 +277,48 @@ internal fun GetEventStreamResponse.getBatchEvent(): BatchEvent? =
 internal fun GetTransactionsStreamResponse.getTxEvent(): TxEvent? =
     when {
         commitment_tx != null -> {
-            TxEvent.CommitmentEvent(commitment_tx)
+            TxEvent.CommitmentEvent(commitment_tx.getNotification())
         }
         ark_tx != null -> {
-            TxEvent.ArkEvent(ark_tx)
+            TxEvent.ArkEvent(ark_tx.getNotification())
         }
         sweep_tx != null -> {
-            TxEvent.SweepEvent(sweep_tx)
+            TxEvent.SweepEvent(sweep_tx.getNotification())
         }
         heartbeat != null -> {
             TxEvent.HeartbeatEvent
         }
         else -> null
     }
+
+internal fun TxNotification.getNotification(): Notification {
+    val checkpointTxs =
+        checkpoint_txs.mapValues { checkpointTx ->
+            Transaction(checkpointTx.value.txid, checkpointTx.value.tx)
+        }
+    val spentVtxos =
+        spent_vtxos.map { spentVtxo ->
+            val outpoint = spentVtxo.outpoint?.txid?.let { OutPoint(TxHash(it), spentVtxo.outpoint.vout.toLong()) }
+            Vtxo.Data(outpoint)
+        }
+    val spendableVtxos =
+        spendable_vtxos.map { spendableVtxo ->
+            val outpoint = spendableVtxo.outpoint?.txid?.let { OutPoint(TxHash(it), spendableVtxo.outpoint.vout.toLong()) }
+            Vtxo.Data(outpoint)
+        }
+    val sweptVtxos =
+        swept_vtxos.map { outpoint ->
+            OutPoint(TxHash(outpoint.txid), outpoint.vout.toLong())
+        }
+    return Notification(
+        txid,
+        tx,
+        checkpointTxs,
+        spentVtxos,
+        spendableVtxos,
+        sweptVtxos,
+    )
+}
 
 /**
  * Creates a gRPC client from the provided service url

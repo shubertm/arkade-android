@@ -5,6 +5,7 @@ import ark.v1.SubmitTxResponse
 import com.arkade.core.ArkServerInfo
 import com.arkade.core.batches.BatchEvent
 import com.arkade.core.intents.ArkIntent
+import com.arkade.core.txs.ArkTransaction
 import com.arkade.core.txs.TxEvent
 import kotlinx.coroutines.flow.Flow
 
@@ -43,7 +44,7 @@ interface ArkadeClient {
     suspend fun submitTransaction(
         signedArkTx: String,
         checkpointTxs: List<String>,
-    ): SubmitTxResponse
+    ): ArkTransaction
 
     /**
      * Finalize processing a transaction
@@ -94,7 +95,7 @@ interface ArkadeClient {
      * @param intent is the intent
      * @return [List] of [PendingTx]
      */
-    suspend fun getPendingTxs(intent: ArkIntent): List<PendingTx>
+    suspend fun getPendingTxs(intent: ArkIntent): List<ArkTransaction>
 
     /**
      * Streams batch events from the Ark server

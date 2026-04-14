@@ -1,18 +1,16 @@
 package com.arkade.core.txs
 
-import ark.v1.TxNotification
-
 sealed interface TxEvent {
     class CommitmentEvent(
-        val commitmentTx: TxNotification?,
+        val commitmentTx: Notification,
     ) : TxEvent
 
     class ArkEvent(
-        val arkTx: TxNotification?,
+        val arkTx: Notification?,
     ) : TxEvent
 
     class SweepEvent(
-        val sweepTx: TxNotification?,
+        val sweepTx: Notification?,
     ) : TxEvent
 
     object HeartbeatEvent : TxEvent

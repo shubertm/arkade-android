@@ -117,6 +117,10 @@ data class Vtxo(
         return now >= exitTime
     }
 
+    data class Data(
+        val outpoint: OutPoint?,
+    )
+
     companion object {
         /**
          * Creates a `VTXO`
