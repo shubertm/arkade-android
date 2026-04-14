@@ -1,10 +1,9 @@
 package com.arkade.network
 
-import ark.v1.PendingTx
-import ark.v1.SubmitTxResponse
 import com.arkade.core.ArkServerInfo
 import com.arkade.core.batches.BatchEvent
 import com.arkade.core.intents.ArkIntent
+import com.arkade.core.txs.ArkTransaction
 import com.arkade.core.txs.TxEvent
 import kotlinx.coroutines.flow.Flow
 
@@ -38,12 +37,12 @@ interface ArkadeClient {
      * Submits a transaction to the Ark server
      * @param signedArkTx is the signed transaction
      * @param checkpointTxs is the list of checkpoint transactions
-     * @return [SubmitTxResponse]
+     * @return a fully signed [ArkTransaction]
      */
     suspend fun submitTransaction(
         signedArkTx: String,
         checkpointTxs: List<String>,
-    ): SubmitTxResponse
+    ): ArkTransaction
 
     /**
      * Finalize processing a transaction
@@ -92,9 +91,9 @@ interface ArkadeClient {
     /**
      * Fetches pending transactions from the Ark server
      * @param intent is the intent
-     * @return [List] of [PendingTx]
+     * @return [List] of [ArkTransaction]
      */
-    suspend fun getPendingTxs(intent: ArkIntent): List<PendingTx>
+    suspend fun getPendingTxs(intent: ArkIntent): List<ArkTransaction>
 
     /**
      * Streams batch events from the Ark server

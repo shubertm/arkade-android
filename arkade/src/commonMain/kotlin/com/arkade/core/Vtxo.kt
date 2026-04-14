@@ -1,5 +1,6 @@
 package com.arkade.core
 
+import com.arkade.core.assets.Asset
 import com.arkade.core.bitcoin.Address
 import com.arkade.core.bitcoin.Network
 import com.arkade.core.bitcoin.Utxo
@@ -116,6 +117,40 @@ data class Vtxo(
         val exitTime = blockConfirmTime + exitDelaySeconds.toDuration(DurationUnit.SECONDS)
         return now >= exitTime
     }
+
+    /**
+     * This is an encapsulation of all `VTXO` data
+     * @param outpoint is the outpoint of the `VTXO`
+     * @param amount is the amount of the `VTXO`
+     * @param script is the script of the `VTXO`
+     * @param createdAt is the time at which the `VTXO` was created
+     * @param expiresAt is the time at which the `VTXO` expires
+     * @param isPreConfirmed is whether the `VTXO` was pre-confirmed
+     * @param isSwept is whether the `VTXO` was swept
+     * @param isUnrolled is whether the `VTXO` was unrolled
+     * @param isSpent is whether the `VTXO` was spent
+     * @param spentBy is the transaction id of the transaction that spent this `VTXO`
+     * @param settledBy is the transaction id of the transaction that settled this `VTXO`
+     * @param arkTxId is the transaction id of the transaction that created this `VTXO`
+     * @param commitmentTxIds is the list of transaction ids of the transactions that created this `VTXO`
+     * @param assets is the list of assets of the `VTXO`
+     */
+    data class Data(
+        val outpoint: OutPoint,
+        val amount: BigDecimal,
+        val script: String,
+        val createdAt: Long,
+        val expiresAt: Long,
+        val isPreConfirmed: Boolean = false,
+        val isSwept: Boolean = false,
+        val isUnrolled: Boolean = false,
+        val isSpent: Boolean = false,
+        val spentBy: String = "",
+        val settledBy: String = "",
+        val arkTxId: String = "",
+        val commitmentTxIds: List<String> = emptyList(),
+        val assets: List<Asset> = emptyList(),
+    )
 
     companion object {
         /**
