@@ -16,6 +16,7 @@ import ark.v1.SubmitTreeNoncesRequest
 import ark.v1.SubmitTreeSignaturesRequest
 import ark.v1.TxNotification
 import com.arkade.core.ArkServerInfo
+import com.arkade.core.Error
 import com.arkade.core.LockedVTXOException
 import com.arkade.core.SpentVTXOException
 import com.arkade.core.Vtxo
@@ -92,13 +93,13 @@ class ArkadeClientImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            val msg = e.message
-            when {
-                (msg?.contains("duplicated input") == true) -> {
+            val error = Error.fromMessage(e.message)
+            when (error) {
+                (Error.DuplicatedInput) -> {
                     throw LockedVTXOException("VTXO is already locked by another intent", e)
                 }
-                (msg?.contains("already spent") == true || msg?.contains("VTXO_ALREADY_SPENT") == true) -> {
-                    throw SpentVTXOException("VTXO input was already spent in a batch: $msg", e)
+                (Error.SpentVtxo) -> {
+                    throw SpentVTXOException("VTXO input was already spent in a batch: ${e.message}", e)
                 }
                 else -> throw e
             }
