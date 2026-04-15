@@ -1,16 +1,13 @@
 package com.arkade.core
 
-import com.arkade.core.Error.SpentVtxo.message2
-
 sealed class Error(
     val message: String,
 ) {
     object DuplicatedInput : Error("duplicated input")
 
-    object SpentVtxo : Error("already spent")
-
-    val SpentVtxo.message2: String
-        get() = "VTXO_ALREADY_SPENT"
+    object SpentVtxo : Error("already spent") {
+        const val MESSAGE2: String = "VTXO_ALREADY_SPENT"
+    }
 
     object Unknown : Error("unknown")
 
@@ -20,7 +17,7 @@ sealed class Error(
                 (message?.contains(DuplicatedInput.message) == true) -> {
                     DuplicatedInput
                 }
-                (message?.contains(SpentVtxo.message) == true || message?.contains(SpentVtxo.message2) == true) -> {
+                (message?.contains(SpentVtxo.message) == true || message?.contains(SpentVtxo.MESSAGE2) == true) -> {
                     SpentVtxo
                 }
                 else -> Unknown

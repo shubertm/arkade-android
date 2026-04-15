@@ -93,13 +93,14 @@ class ArkadeClientImpl(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            val error = Error.fromMessage(e.message)
+            val msg = e.message
+            val error = Error.fromMessage(msg)
             when (error) {
                 (Error.DuplicatedInput) -> {
                     throw LockedVTXOException("VTXO is already locked by another intent", e)
                 }
                 (Error.SpentVtxo) -> {
-                    throw SpentVTXOException("VTXO input was already spent in a batch: ${e.message}", e)
+                    throw SpentVTXOException("VTXO input was already spent in a batch: $msg", e)
                 }
                 else -> throw e
             }
