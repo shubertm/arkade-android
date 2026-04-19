@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_PARAMETER")
+
 package com.arkade.utils
 
 actual fun Log.debug(

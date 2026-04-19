@@ -28,7 +28,7 @@ actual fun Log.verbose(
     tag: String,
     message: String,
 ) {
-    Logger.getLogger(tag).log(Level.ALL, message)
+    Logger.getLogger(tag).log(Level.FINEST, message)
 }
 
 actual fun Log.error(
