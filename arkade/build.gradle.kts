@@ -89,7 +89,6 @@ kotlin {
                 implementation(libs.androidx.core)
 
                 implementation(libs.junit)
-                implementation(libs.robolectric)
             }
         }
 
