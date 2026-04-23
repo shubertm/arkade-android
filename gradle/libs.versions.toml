@@ -19,14 +19,25 @@ activityCompose = "1.13.0"
 composeBom = "2025.07.00"
 kotlinSerialization = "1.10.0"
 squareWire = "6.1.0"
+room = "2.8.4"
+sqlite = "2.6.2"
+ksp = "2.3.6"
+robolectric = "4.16.1"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-sqlite-wrapper = { module = "androidx.room:room-sqlite-wrapper", version.ref = "room" }
+
+bignum = { module = "com.ionspin.kotlin:bignum", version.ref = "bignum" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 bitcoin-kmp = { module = "fr.acinq.bitcoin:bitcoin-kmp", version.ref = "bitcoinKmp" }
@@ -62,6 +73,8 @@ androidx-compose-material3-adaptive-navigation-suite = { group = "androidx.compo
 square-wire-runtime = { group = "com.squareup.wire", name = "wire-runtime", version.ref = "squareWire" }
 square-wire-grpc-client = { group = "com.squareup.wire", name = "wire-grpc-client", version.ref = "squareWire" }
 
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric"}
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -74,5 +87,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 square-wire = { id = "com.squareup.wire", version.ref = "squareWire" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+androidx-room = { id = "androidx.room", version.ref = "room" }
 
 

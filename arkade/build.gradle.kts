@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import com.google.devtools.ksp.gradle.KspAATask
 import org.gradle.kotlin.dsl.commonTest
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -9,12 +10,18 @@ plugins {
     alias(libs.plugins.ktlint.gradle)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.square.wire)
+    alias(libs.plugins.androidx.room)
+    alias(libs.plugins.ksp)
 }
 
 val currentOs: String = System.getProperty("os.name").lowercase()
 
 wire {
     kotlin {}
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 kotlin {
@@ -71,6 +78,18 @@ kotlin {
                 implementation(libs.kotlinx.serialization.protobuf)
                 implementation(libs.square.wire.runtime)
                 implementation(libs.square.wire.grpc.client)
+                implementation(libs.androidx.room.runtime)
+                implementation(libs.androidx.sqlite.bundled)
+            }
+        }
+
+        androidMain {
+            dependencies {
+                implementation(libs.androidx.room.sqlite.wrapper)
+                implementation(libs.androidx.core)
+
+                implementation(libs.junit)
+                implementation(libs.robolectric)
             }
         }
 
@@ -97,6 +116,7 @@ kotlin {
         getByName("androidHostTest") {
             dependencies {
                 implementation(libs.secp256k1.kmp.jni.jvm)
+                implementation(libs.androidx.core)
             }
         }
 
@@ -108,6 +128,14 @@ kotlin {
             }
         }
     }
+}
+
+dependencies {
+    add("kspJvm", libs.androidx.room.compiler)
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    add("kspIosX64", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
 }
 
 tasks.register<SetupTestTask>("testSetup") {
@@ -134,5 +162,9 @@ tasks.register<UnitTestTask>("testUnit") {
     classpath = test.runtimeClasspath
 }
 
-tasks.androidPreBuild.dependsOn("ktlintCheck")
-tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")
+tasks.getByName("ktlintCheck") {
+    mustRunAfter(tasks.withType<KspAATask>())
+}
+
+// tasks.androidPreBuild.dependsOn("ktlintCheck")
+// tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")

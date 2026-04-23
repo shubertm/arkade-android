@@ -72,12 +72,26 @@ Run the sample app:
 ## Usage Example
 Here’s a simple example of how to initialize the SDK in Kotlin:
 
+**Single Key**
 ```kotlin
-import arkade.core.Wallet
+import arkade.core.wallet.Wallet
 
 fun main() {
-    val wallet = Wallet.create("mySeedPhrase")
-    println("Wallet address: ${wallet.address}")
+    val nsec = ""
+    val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
+    val serverInfo = client.getInfo()
+    val wallet = Wallet.create(nsec, null, serverInfo)
+}
+```
+**HD**
+```kotlin
+import arkade.core.wallet.Wallet
+
+fun main() {
+    val secret = "secret"
+    val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
+    val serverInfo = client.getInfo()
+    val wallet = Wallet.create(secret, null, serverInfo)
 }
 ```
 

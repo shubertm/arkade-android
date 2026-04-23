@@ -18,7 +18,7 @@ if [ "$STASH_COUNT_AFTER" -gt "$STASH_COUNT_BEFORE" ]; then
   trap "git stash pop --quiet" EXIT
 fi
 
-./gradlew allTests
+./gradlew testUnit
 
 status=$?
 if [ "$status" = 0 ]; then

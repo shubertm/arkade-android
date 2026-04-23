@@ -14,6 +14,7 @@ enum class Network {
                 "bitcoin" -> MAINNET
                 "testnet" -> TESTNET
                 "signet" -> SIGNET
+                "mutinynet" -> SIGNET
                 "regtest" -> REGTEST
                 else -> throw IllegalArgumentException("Invalid network: $network")
             }
