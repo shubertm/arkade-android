@@ -5,6 +5,7 @@ import com.arkade.core.ArkServerInfo
 import com.arkade.core.bitcoin.Network
 import com.arkade.repositories.WalletRepo
 import com.arkade.repositories.WalletRepoImpl
+import com.arkade.storage.db.entities.WalletEntity
 import fr.acinq.bitcoin.Bech32
 import fr.acinq.bitcoin.DeterministicWallet
 import fr.acinq.bitcoin.KeyPath
@@ -27,6 +28,8 @@ interface Wallet {
     suspend fun update()
 
     suspend fun updateLastUsedIndex(index: Int)
+
+    fun toRoomEntity(): WalletEntity = WalletEntity(id, secret, destination, type, accountDescriptor, lastUsedIndex)
 
     enum class Type {
         HD,
@@ -58,12 +61,12 @@ interface Wallet {
         suspend fun loadById(
             id: String,
             isTest: Boolean = false,
-        ): Wallet {
+        ): Wallet? {
             val repo: WalletRepo = WalletRepoImpl(isTest)
             return repo.loadWalletById(id)
         }
 
-        suspend fun loadByFingerprint(fingerprint: String): Wallet {
+        suspend fun loadByFingerprint(fingerprint: String): Wallet? {
             val repo: WalletRepo = WalletRepoImpl()
             return repo.loadWalletByFingerprint(fingerprint)
         }

@@ -9,7 +9,6 @@ import com.arkade.repositories.WalletRepoImpl
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 class SingleKeyWalletTest {
     @Test
@@ -31,7 +30,7 @@ class SingleKeyWalletTest {
 
             val loadedWallet = Wallet.loadById(wallet.id)
 
-            assertEquals(wallet.id, loadedWallet.id)
+            assertEquals(wallet.id, loadedWallet?.id!!)
             assertEquals(wallet.secret, loadedWallet.secret)
             assertEquals(wallet.destination, loadedWallet.destination)
             assertEquals(wallet.type, loadedWallet.type)
@@ -39,9 +38,7 @@ class SingleKeyWalletTest {
 
             loadedWallet.delete()
 
-            assertFailsWith(IllegalStateException::class) {
-                Wallet.loadById(wallet.id)
-            }
+            assertEquals(null, Wallet.loadById(wallet.id))
         }
 
     @Test
@@ -97,7 +94,7 @@ class HDWalletTest {
 
             val loadedWallet = Wallet.loadById(wallet.id)
 
-            assertEquals(wallet.id, loadedWallet.id)
+            assertEquals(wallet.id, loadedWallet?.id!!)
             assertEquals(wallet.secret, loadedWallet.secret)
             assertEquals(wallet.destination, loadedWallet.destination)
             assertEquals(wallet.type, loadedWallet.type)
@@ -108,13 +105,11 @@ class HDWalletTest {
 
             val loadedWallet2 = Wallet.loadById(loadedWallet.id)
 
-            assertEquals(1, loadedWallet2.lastUsedIndex)
+            assertEquals(1, loadedWallet2?.lastUsedIndex)
 
             loadedWallet.delete()
 
-            assertFailsWith(IllegalStateException::class) {
-                Wallet.loadById(wallet.id)
-            }
+            assertEquals(null, Wallet.loadById(wallet.id))
         }
 
     @Test

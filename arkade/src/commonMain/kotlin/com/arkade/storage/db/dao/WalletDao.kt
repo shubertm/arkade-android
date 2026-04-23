@@ -12,7 +12,7 @@ interface WalletDao {
     suspend fun save(wallet: WalletEntity)
 
     @Query("SELECT * FROM wallets WHERE id = :id")
-    suspend fun load(id: String): WalletEntity
+    suspend fun load(id: String): WalletEntity?
 
     @Query("SELECT * FROM wallets")
     suspend fun loadAll(): List<WalletEntity>
