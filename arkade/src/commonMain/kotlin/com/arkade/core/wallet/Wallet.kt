@@ -5,6 +5,7 @@ import com.arkade.core.ArkServerInfo
 import com.arkade.core.bitcoin.Network
 import com.arkade.repositories.WalletRepo
 import com.arkade.repositories.WalletRepoImpl
+import com.arkade.storage.db.Database
 import com.arkade.storage.db.entities.WalletEntity
 import fr.acinq.bitcoin.Bech32
 import fr.acinq.bitcoin.DeterministicWallet
@@ -43,13 +44,13 @@ interface Wallet {
             secret: String,
             destination: String? = null,
             serverInfo: ArkServerInfo,
-            isTest: Boolean = false,
+            testDb: Database? = null,
         ): Wallet {
             if (destination != null) {
                 validateDestination(destination, serverInfo)
             }
 
-            val repo: WalletRepo = WalletRepoImpl(isTest)
+            val repo: WalletRepo = WalletRepoImpl(testDb)
 
             return if (secret.startsWith(NSEC_HRP, true)) {
                 createNSecWallet(secret, destination, repo)
@@ -60,9 +61,9 @@ interface Wallet {
 
         suspend fun loadById(
             id: String,
-            isTest: Boolean = false,
+            testDb: Database? = null,
         ): Wallet? {
-            val repo: WalletRepo = WalletRepoImpl(isTest)
+            val repo: WalletRepo = WalletRepoImpl(testDb)
             return repo.loadWalletById(id)
         }
 

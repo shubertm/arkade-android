@@ -3,11 +3,12 @@ package com.arkade.repositories
 import com.arkade.core.wallet.Storage
 import com.arkade.core.wallet.StorageImpl
 import com.arkade.core.wallet.Wallet
+import com.arkade.storage.db.Database
 
 internal class WalletRepoImpl(
-    private val isTest: Boolean = false,
+    private val testDb: Database? = null,
 ) : WalletRepo {
-    private val storage: Storage = StorageImpl.get(isTest)
+    private val storage: Storage = StorageImpl.get(testDb)
 
     override suspend fun saveWallet(wallet: Wallet) {
         storage.saveWallet(wallet.toRoomEntity())

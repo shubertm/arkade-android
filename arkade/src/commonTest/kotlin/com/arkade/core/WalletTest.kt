@@ -6,29 +6,32 @@ import com.arkade.network.Config
 import com.arkade.network.grpc.ArkadeClientImpl
 import com.arkade.repositories.WalletRepo
 import com.arkade.repositories.WalletRepoImpl
+import com.arkade.storage.db.initializeTestDb
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SingleKeyWalletTest {
+    private val testDb = initializeTestDb()
+    private val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
+
     @Test
     fun should_create_wallet_on_mutinynet_successfully() =
         runTest {
-            val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
             val serverInfo = client.getInfo()
             val nsec = "nsec1wr49duqpjavggh78ewu9zlcuvw5huh6x5kqweqwnmjgw78kqqt6qsk0w9k"
             val wallet =
                 Wallet.create(
                     nsec,
                     serverInfo = serverInfo,
-                    isTest = true,
+                    testDb = testDb,
                 )
             assertEquals(nsec, wallet.secret)
             assertEquals(Wallet.Type.SINGLE_KEY, wallet.type)
 
             wallet.save()
 
-            val loadedWallet = Wallet.loadById(wallet.id)
+            val loadedWallet = Wallet.loadById(wallet.id, testDb)
 
             assertEquals(wallet.id, loadedWallet?.id!!)
             assertEquals(wallet.secret, loadedWallet.secret)
@@ -52,16 +55,15 @@ class SingleKeyWalletTest {
                     "nsec1wzt73wjccrw4hm7wjpazp8vgcypvhu4egx3syzu6dgqz69kvewzs72kpx9",
                     "nsec1smd696h88hn2qje5ygzgx29n3u6dycvx2yh2lvgm2ey4q635manqnys59p",
                 )
-            val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
             val serverInfo = client.getInfo()
             val wallets = mutableListOf<Wallet>()
             for (nsec in nsecs) {
-                val wallet = Wallet.create(nsec, serverInfo = serverInfo, isTest = true)
+                val wallet = Wallet.create(nsec, serverInfo = serverInfo, testDb = testDb)
                 wallets.add(wallet)
                 wallet.save()
             }
 
-            val repo: WalletRepo = WalletRepoImpl(isTest = true)
+            val repo: WalletRepo = WalletRepoImpl(testDb)
 
             val loadedWallets = repo.loadWallets().filter { w -> w.type == Wallet.Type.SINGLE_KEY }
 
@@ -75,16 +77,19 @@ class SingleKeyWalletTest {
 }
 
 class HDWalletTest {
+    private val testDb = initializeTestDb()
+    private val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
+
     @Test
     fun should_create_wallet_on_mutinynet_successfully() =
         runTest {
-            val serverInfo = ArkadeClientImpl(Config.MUTINYNET).getInfo()
+            val serverInfo = client.getInfo()
             val secret = "secret"
             val wallet =
                 Wallet.create(
                     secret,
                     serverInfo = serverInfo,
-                    isTest = true,
+                    testDb = testDb,
                 )
             assertEquals(secret, wallet.secret)
             assertEquals(Wallet.Type.HD, wallet.type)
@@ -103,7 +108,7 @@ class HDWalletTest {
 
             loadedWallet.updateLastUsedIndex(1)
 
-            val loadedWallet2 = Wallet.loadById(loadedWallet.id)
+            val loadedWallet2 = Wallet.loadById(loadedWallet.id, testDb)
 
             assertEquals(1, loadedWallet2?.lastUsedIndex)
 
@@ -123,16 +128,15 @@ class HDWalletTest {
                     "secret3",
                     "secret4",
                 )
-            val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
             val serverInfo = client.getInfo()
             val wallets = mutableListOf<Wallet>()
             for (secret in secrets) {
-                val wallet = Wallet.create(secret, serverInfo = serverInfo, isTest = true)
+                val wallet = Wallet.create(secret, serverInfo = serverInfo, testDb = testDb)
                 wallets.add(wallet)
                 wallet.save()
             }
 
-            val repo: WalletRepo = WalletRepoImpl(isTest = true)
+            val repo: WalletRepo = WalletRepoImpl(testDb)
 
             val loadedWallets = repo.loadWallets().filter { w -> w.type == Wallet.Type.HD }
 

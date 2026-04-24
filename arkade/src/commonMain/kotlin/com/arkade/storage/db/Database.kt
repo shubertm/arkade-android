@@ -21,5 +21,3 @@ abstract class Database : RoomDatabase() {
 expect object DatabaseConstructor : RoomDatabaseConstructor<com.arkade.storage.db.Database> {
     override fun initialize(): com.arkade.storage.db.Database
 }
-
-expect fun initializeTestDb(): com.arkade.storage.db.Database

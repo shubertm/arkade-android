@@ -1,18 +1,13 @@
 package com.arkade.core.wallet
 
+import com.arkade.storage.db.Database
 import com.arkade.storage.db.DatabaseConstructor
 import com.arkade.storage.db.entities.WalletEntity
-import com.arkade.storage.db.initializeTestDb
 
 internal class StorageImpl private constructor(
-    private val isTest: Boolean = false,
+    testDb: Database? = null,
 ) : Storage {
-    private val db =
-        if (!isTest) {
-            DatabaseConstructor.initialize()
-        } else {
-            initializeTestDb()
-        }
+    private val db = testDb ?: DatabaseConstructor.initialize()
     private val walletDao = db.walletDao()
 
     override suspend fun loadWalletById(id: String): WalletEntity? = walletDao.load(id)
@@ -32,9 +27,9 @@ internal class StorageImpl private constructor(
     companion object {
         private var storage: Storage? = null
 
-        fun get(isTest: Boolean = false): Storage {
+        fun get(testDb: Database? = null): Storage {
             if (storage == null) {
-                storage = StorageImpl(isTest)
+                storage = StorageImpl(testDb)
             }
             return storage!!
         }

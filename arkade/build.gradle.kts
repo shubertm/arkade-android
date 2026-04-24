@@ -86,9 +86,6 @@ kotlin {
         androidMain {
             dependencies {
                 implementation(libs.androidx.room.sqlite.wrapper)
-                implementation(libs.androidx.core)
-
-                implementation(libs.junit)
             }
         }
 
@@ -115,14 +112,14 @@ kotlin {
         getByName("androidHostTest") {
             dependencies {
                 implementation(libs.secp256k1.kmp.jni.jvm)
-                implementation(libs.androidx.core)
+                implementation(libs.androidx.test.core)
             }
         }
 
         getByName("androidDeviceTest") {
             dependencies {
-                implementation(libs.androidx.runner)
-                implementation(libs.androidx.core)
+                implementation(libs.androidx.test.runner)
+                implementation(libs.androidx.test.core)
                 implementation(libs.androidx.junit)
             }
         }
