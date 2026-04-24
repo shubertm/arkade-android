@@ -148,7 +148,9 @@ interface Wallet {
         }
 
         private fun getPrivateKeyFromNSec(nsec: String): PrivateKey {
-            val (_, bytes, _) = Bech32.decodeBytes(nsec)
+            val (hrp, bytes, _) = Bech32.decodeBytes(nsec)
+            require(hrp == NSEC_HRP) { "Invalid nsec HRP: $hrp" }
+            require(bytes.size == 32) { "Invalid nsec payload size: ${bytes.size}" }
             return PrivateKey.fromHex(bytes.toHexString())
         }
     }
