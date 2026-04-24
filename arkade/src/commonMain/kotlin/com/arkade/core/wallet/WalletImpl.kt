@@ -18,7 +18,9 @@ class WalletImpl(
     override suspend fun update() = repo.updateWallet(this)
 
     override suspend fun updateLastUsedIndex(index: Int) {
+        require(index >= lastUsedIndex) { "Invalid last used index" }
+        val oldLastUsedIndex = lastUsedIndex
         lastUsedIndex = index
-        update()
+        runCatching { update() }.onFailure { lastUsedIndex = oldLastUsedIndex }
     }
 }
