@@ -74,24 +74,37 @@ Here’s a simple example of how to initialize the SDK in Kotlin:
 
 **Single Key**
 ```kotlin
-import arkade.core.wallet.Wallet
+import com.arkade.core.wallet.Wallet
+import com.arkade.network.ArkadeClient
+import com.arkade.network.ArkadeClientImpl
+import com.arkade.network.Config
+
 
 fun main() {
-    val nsec = ""
-    val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
-    val serverInfo = client.getInfo()
-    val wallet = Wallet.create(nsec, null, serverInfo)
+    val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    coroutineScope.launch {
+        val nsec = "nsec1wr49duqpjavggh78ewu9zlcuvw5huh6x5kqweqwnmjgw78kqqt6qsk0w9k"
+        val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
+        val serverInfo = client.getInfo()
+        val wallet = Wallet.create(nsec, null, serverInfo)
+    }                                                                   
 }
 ```
 **HD**
 ```kotlin
-import arkade.core.wallet.Wallet
+import com.arkade.core.wallet.Wallet
+import com.arkade.network.ArkadeClient
+import com.arkade.network.ArkadeClientImpl
+import com.arkade.network.Config
 
 fun main() {
-    val secret = "secret"
-    val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
-    val serverInfo = client.getInfo()
-    val wallet = Wallet.create(secret, null, serverInfo)
+    val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    coroutineScope.launch {
+        val secret = "secret"
+        val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
+        val serverInfo = client.getInfo()
+        val wallet = Wallet.create(secret, null, serverInfo)
+    }
 }
 ```
 
