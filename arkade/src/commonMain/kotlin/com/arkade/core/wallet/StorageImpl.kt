@@ -3,6 +3,8 @@ package com.arkade.core.wallet
 import com.arkade.storage.db.Database
 import com.arkade.storage.db.DatabaseConstructor
 import com.arkade.storage.db.entities.WalletEntity
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 internal class StorageImpl private constructor(
     testDb: Database? = null,
@@ -22,12 +24,16 @@ internal class StorageImpl private constructor(
 
     companion object {
         private var storage: Storage? = null
+        private var testStorage: Storage? = null
+        private val mutex = Mutex()
 
-        fun get(testDb: Database? = null): Storage {
-            if (storage == null) {
-                storage = StorageImpl(testDb)
+        suspend fun get(testDb: Database? = null): Storage =
+            mutex.withLock {
+                if (testDb != null) {
+                    testStorage ?: StorageImpl(testDb).also { testStorage = it }
+                } else {
+                    storage ?: StorageImpl().also { storage = it }
+                }
             }
-            return storage!!
-        }
     }
 }

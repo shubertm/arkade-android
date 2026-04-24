@@ -3,6 +3,8 @@ package com.arkade.repositories
 import com.arkade.core.wallet.Wallet
 
 interface WalletRepo {
+    suspend fun init()
+
     suspend fun saveWallet(wallet: Wallet)
 
     suspend fun loadWalletById(id: String): Wallet?

@@ -8,6 +8,6 @@ actual fun initializeTestDb(): Database =
     Room
         .inMemoryDatabaseBuilder<Database>(
             factory = { DatabaseConstructor.initialize() },
-        ).setQueryCoroutineContext(Dispatchers.Unconfined)
+        ).setQueryCoroutineContext(Dispatchers.IO)
         .setDriver(BundledSQLiteDriver())
         .build()

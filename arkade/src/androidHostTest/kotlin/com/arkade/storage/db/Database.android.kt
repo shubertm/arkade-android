@@ -13,7 +13,7 @@ actual fun initializeTestDb(): Database {
         .inMemoryDatabaseBuilder(
             context,
             Database::class.java,
-        ).setQueryCoroutineContext(Dispatchers.Unconfined)
+        ).setQueryCoroutineContext(Dispatchers.IO)
         .setDriver(BundledSQLiteDriver())
         .build()
 }

@@ -43,7 +43,7 @@ class SingleKeyWalletTest : WalletTest() {
 
             loadedWallet.delete()
 
-            assertEquals(null, Wallet.loadById(wallet.id))
+            assertEquals(null, Wallet.loadById(wallet.id, testDb))
         }
 
     @Test
@@ -66,6 +66,7 @@ class SingleKeyWalletTest : WalletTest() {
             }
 
             val repo: WalletRepo = WalletRepoImpl(testDb)
+            repo.init()
 
             val loadedWallets = repo.loadWallets().filter { w -> w.type == Wallet.Type.SINGLE_KEY }
 
@@ -99,7 +100,7 @@ class HDWalletTest : WalletTest() {
 
             wallet.save()
 
-            val loadedWallet = Wallet.loadById(wallet.id)
+            val loadedWallet = Wallet.loadById(wallet.id, testDb)
 
             assertEquals(wallet.id, loadedWallet?.id!!)
             assertEquals(wallet.secret, loadedWallet.secret)
@@ -116,7 +117,7 @@ class HDWalletTest : WalletTest() {
 
             loadedWallet.delete()
 
-            assertEquals(null, Wallet.loadById(wallet.id))
+            assertEquals(null, Wallet.loadById(wallet.id, testDb))
         }
 
     @Test
@@ -139,6 +140,7 @@ class HDWalletTest : WalletTest() {
             }
 
             val repo: WalletRepo = WalletRepoImpl(testDb)
+            repo.init()
 
             val loadedWallets = repo.loadWallets().filter { w -> w.type == Wallet.Type.HD }
 

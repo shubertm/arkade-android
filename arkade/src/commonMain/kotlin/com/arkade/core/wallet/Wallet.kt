@@ -11,6 +11,9 @@ import fr.acinq.bitcoin.Bech32
 import fr.acinq.bitcoin.DeterministicWallet
 import fr.acinq.bitcoin.KeyPath
 import fr.acinq.bitcoin.PrivateKey
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 
 interface Wallet {
     val id: String
@@ -40,32 +43,36 @@ interface Wallet {
     companion object {
         private const val NSEC_HRP = "nsec"
 
-        fun create(
+        suspend fun create(
             secret: String,
             destination: String? = null,
             serverInfo: ArkServerInfo,
             testDb: Database? = null,
-        ): Wallet {
-            if (destination != null) {
-                validateDestination(destination, serverInfo)
-            }
+        ): Wallet =
+            withContext(Dispatchers.IO) {
+                if (destination != null) {
+                    validateDestination(destination, serverInfo)
+                }
 
-            val repo: WalletRepo = WalletRepoImpl(testDb)
+                val repo: WalletRepo = WalletRepoImpl(testDb)
+                repo.init()
 
-            return if (secret.startsWith(NSEC_HRP, true)) {
-                createNSecWallet(secret, destination, repo)
-            } else {
-                createHDWallet(secret, destination, serverInfo, repo)
+                if (secret.startsWith(NSEC_HRP, true)) {
+                    createNSecWallet(secret, destination, repo)
+                } else {
+                    createHDWallet(secret, destination, serverInfo, repo)
+                }
             }
-        }
 
         suspend fun loadById(
             id: String,
             testDb: Database? = null,
-        ): Wallet? {
-            val repo: WalletRepo = WalletRepoImpl(testDb)
-            return repo.loadWalletById(id)
-        }
+        ): Wallet? =
+            withContext(Dispatchers.IO) {
+                val repo: WalletRepo = WalletRepoImpl(testDb)
+                repo.init()
+                repo.loadWalletById(id)
+            }
 
         fun getOutputDescriptorFromNSec(nsec: String): String {
             val privateKey = getPrivateKeyFromNSec(nsec)

@@ -8,7 +8,11 @@ import com.arkade.storage.db.Database
 internal class WalletRepoImpl(
     private val testDb: Database? = null,
 ) : WalletRepo {
-    private val storage: Storage = StorageImpl.get(testDb)
+    private lateinit var storage: Storage
+
+    override suspend fun init() {
+        storage = StorageImpl.get(testDb)
+    }
 
     override suspend fun saveWallet(wallet: Wallet) {
         storage.saveWallet(wallet.toRoomEntity())
