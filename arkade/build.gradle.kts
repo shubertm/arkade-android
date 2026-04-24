@@ -93,6 +93,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.androidx.sqlite.bundled)
             }
         }
 
@@ -112,12 +113,17 @@ kotlin {
         getByName("androidHostTest") {
             dependencies {
                 implementation(libs.secp256k1.kmp.jni.jvm)
+                implementation(libs.androidx.test.runner)
                 implementation(libs.androidx.test.core)
+                implementation(libs.androidx.junit)
+                implementation(libs.robolectric)
+                implementation(libs.androidx.sqlite.bundled.jvm)
             }
         }
 
         getByName("androidDeviceTest") {
             dependencies {
+                implementation(libs.secp256k1.kmp.jni.android)
                 implementation(libs.androidx.test.runner)
                 implementation(libs.androidx.test.core)
                 implementation(libs.androidx.junit)

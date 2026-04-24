@@ -11,7 +11,9 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class SingleKeyWalletTest {
+expect open class WalletTest()
+
+class SingleKeyWalletTest : WalletTest() {
     private val testDb = initializeTestDb()
     private val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
 
@@ -76,7 +78,7 @@ class SingleKeyWalletTest {
         }
 }
 
-class HDWalletTest {
+class HDWalletTest : WalletTest() {
     private val testDb = initializeTestDb()
     private val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
 
