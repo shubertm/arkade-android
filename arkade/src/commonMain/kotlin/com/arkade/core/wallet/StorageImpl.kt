@@ -12,10 +12,6 @@ internal class StorageImpl private constructor(
 
     override suspend fun loadWalletById(id: String): WalletEntity? = walletDao.load(id)
 
-    override suspend fun loadWalletByFingerprint(fingerprint: String): WalletEntity? {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun loadWallets(): List<WalletEntity> = walletDao.loadAll()
 
     override suspend fun saveWallet(wallet: WalletEntity) = walletDao.save(wallet)

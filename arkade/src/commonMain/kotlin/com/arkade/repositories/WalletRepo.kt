@@ -7,8 +7,6 @@ interface WalletRepo {
 
     suspend fun loadWalletById(id: String): Wallet?
 
-    suspend fun loadWalletByFingerprint(fingerprint: String): Wallet?
-
     suspend fun loadWallets(): List<Wallet>
 
     suspend fun deleteWallet(id: String)

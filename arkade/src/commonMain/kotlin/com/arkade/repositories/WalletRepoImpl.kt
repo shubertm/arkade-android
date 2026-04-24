@@ -19,10 +19,6 @@ internal class WalletRepoImpl(
         return entity?.toWallet(this)
     }
 
-    override suspend fun loadWalletByFingerprint(fingerprint: String): Wallet? {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun loadWallets(): List<Wallet> =
         storage.loadWallets().map { entity ->
             entity.toWallet(this)

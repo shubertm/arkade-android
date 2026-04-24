@@ -67,11 +67,6 @@ interface Wallet {
             return repo.loadWalletById(id)
         }
 
-        suspend fun loadByFingerprint(fingerprint: String): Wallet? {
-            val repo: WalletRepo = WalletRepoImpl()
-            return repo.loadWalletByFingerprint(fingerprint)
-        }
-
         fun getOutputDescriptorFromNSec(nsec: String): String {
             val privateKey = getPrivateKeyFromNSec(nsec)
             return "tr(${privateKey.publicKey().toHex()})"
