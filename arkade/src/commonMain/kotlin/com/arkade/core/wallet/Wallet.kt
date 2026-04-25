@@ -118,7 +118,11 @@ interface Wallet {
                     Network.MAINNET -> pubKey.encode(false)
                     else -> pubKey.encode(true)
                 }
-            val fingerprint = masterKey.extendedPublicKey.fingerprint().toString(16)
+            val fingerprint =
+                masterKey.extendedPublicKey
+                    .fingerprint()
+                    .toString(16)
+                    .padStart(8, '0')
             val coinType =
                 when (serverInfo.network) {
                     Network.MAINNET -> 0
