@@ -1,5 +1,6 @@
 package com.arkade.core.wallet
 
+import androidx.annotation.VisibleForTesting
 import com.arkade.storage.db.Database
 import com.arkade.storage.db.DatabaseConstructor
 import com.arkade.storage.db.entities.WalletEntity
@@ -35,5 +36,10 @@ internal class StorageImpl private constructor(
                     storage ?: StorageImpl().also { storage = it }
                 }
             }
+
+        @VisibleForTesting
+        fun reset() {
+            testStorage = null
+        }
     }
 }

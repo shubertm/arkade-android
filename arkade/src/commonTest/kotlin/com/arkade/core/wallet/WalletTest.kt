@@ -1,26 +1,77 @@
-package com.arkade.core
+package com.arkade.core.wallet
 
-import com.arkade.core.wallet.Wallet
-import com.arkade.network.ArkadeClient
-import com.arkade.network.Config
-import com.arkade.network.grpc.ArkadeClientImpl
+import com.arkade.core.ArkServerInfo
+import com.arkade.core.bitcoin.Address
+import com.arkade.core.bitcoin.Hrp
+import com.arkade.core.bitcoin.Network
+import com.arkade.core.bitcoin.WitnessVersion
+import com.arkade.core.toXOnlyPubKey
 import com.arkade.repositories.WalletRepo
 import com.arkade.repositories.WalletRepoImpl
-import com.arkade.storage.db.initializeTestDb
+import com.arkade.storage.db.Database
 import kotlinx.coroutines.test.runTest
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 
-expect open class WalletTest()
+expect open class WalletTest() {
+    val testDb: Database
 
-class SingleKeyWalletTest : WalletTest() {
-    private val testDb = initializeTestDb()
-    private val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
+    @AfterTest
+    open fun cleanup()
 
     @Test
-    fun should_create_wallet_on_mutinynet_successfully() =
+    open fun should_create_wallet_successfully()
+
+    @Test
+    open fun should_load_more_wallets_successfully()
+}
+
+fun getArkServerInfo(): ArkServerInfo =
+    ArkServerInfo(
+        version = "",
+        signerPubKey = "fa73c6e4876ffb2dfc961d763cca9abc73d4b88efcb8f5e7ff92dc55e9aa553d".toXOnlyPubKey(),
+        forfeitPubKey = "dfcaec558c7e78cf3e38b898ba8a43cfb5727266bae32c5c5b3aeb32c558aa0b".toXOnlyPubKey(),
+        forfeitAddress =
+            Address(
+                hrp = Hrp.TESTNETS,
+                witnessVersion = WitnessVersion.SEGWIT,
+                witnessProgram = "15048e41633084bfcae91d03b3c2bb7f6ac78440".hexToByteArray(),
+            ),
+        checkpointTapScript = "03a80040b27520dfcaec558c7e78cf3e38b898ba8a43cfb5727266bae32c5c5b3aeb32c558aa0bac",
+        network = Network.SIGNET,
+        sessionDuration = 1.minutes,
+        unilateralExitDelay = 2.days,
+        boardingExitDelay = 180.days,
+        utxoMinAmount = 330,
+        utxoMaxAmount = -1,
+        vtxoMinAmount = 1,
+        vtxoMaxAmount = -1,
+        dust = 330,
+        fees = null,
+        scheduledSession = null,
+        deprecatedSigners = listOf(),
+        serviceStatus = mapOf(),
+        digest = "50da3e81cba4844be3559638cf7104a64e30c616bd5862e86b3903222ece0994",
+        maxTxWeight = 40000,
+        maxOpReturnOutputs = 3,
+    )
+
+class SingleKeyWalletTest : WalletTest() {
+    private val serverInfo = getArkServerInfo()
+
+    @AfterTest
+    override fun cleanup() {
         runTest {
-            val serverInfo = client.getInfo()
+            StorageImpl.reset()
+        }
+    }
+
+    @Test
+    override fun should_create_wallet_successfully() {
+        runTest {
             val nsec = "nsec1wr49duqpjavggh78ewu9zlcuvw5huh6x5kqweqwnmjgw78kqqt6qsk0w9k"
             val wallet =
                 Wallet.create(
@@ -45,9 +96,10 @@ class SingleKeyWalletTest : WalletTest() {
 
             assertEquals(null, Wallet.loadById(wallet.id, testDb))
         }
+    }
 
     @Test
-    fun should_load_more_wallets_on_mutinynet_successfully() =
+    override fun should_load_more_wallets_successfully() {
         runTest {
             val nsecs =
                 listOf(
@@ -57,7 +109,6 @@ class SingleKeyWalletTest : WalletTest() {
                     "nsec1wzt73wjccrw4hm7wjpazp8vgcypvhu4egx3syzu6dgqz69kvewzs72kpx9",
                     "nsec1smd696h88hn2qje5ygzgx29n3u6dycvx2yh2lvgm2ey4q635manqnys59p",
                 )
-            val serverInfo = client.getInfo()
             val wallets = mutableListOf<Wallet>()
             for (nsec in nsecs) {
                 val wallet = Wallet.create(nsec, serverInfo = serverInfo, testDb = testDb)
@@ -77,16 +128,20 @@ class SingleKeyWalletTest : WalletTest() {
                 assertEquals(wallet.secret, loadedWallet.secret)
             }
         }
+    }
 }
 
 class HDWalletTest : WalletTest() {
-    private val testDb = initializeTestDb()
-    private val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
+    private val serverInfo = getArkServerInfo()
+
+    @AfterTest
+    override fun cleanup() {
+        runTest { StorageImpl.reset() }
+    }
 
     @Test
-    fun should_create_wallet_on_mutinynet_successfully() =
+    override fun should_create_wallet_successfully() {
         runTest {
-            val serverInfo = client.getInfo()
             val secret = "secret"
             val wallet =
                 Wallet.create(
@@ -119,9 +174,10 @@ class HDWalletTest : WalletTest() {
 
             assertEquals(null, Wallet.loadById(wallet.id, testDb))
         }
+    }
 
     @Test
-    fun should_load_more_wallets_on_mutinynet_successfully() =
+    override fun should_load_more_wallets_successfully() {
         runTest {
             val secrets =
                 listOf(
@@ -131,7 +187,6 @@ class HDWalletTest : WalletTest() {
                     "secret3",
                     "secret4",
                 )
-            val serverInfo = client.getInfo()
             val wallets = mutableListOf<Wallet>()
             for (secret in secrets) {
                 val wallet = Wallet.create(secret, serverInfo = serverInfo, testDb = testDb)
@@ -151,4 +206,5 @@ class HDWalletTest : WalletTest() {
                 assertEquals(wallet.secret, loadedWallet.secret)
             }
         }
+    }
 }
