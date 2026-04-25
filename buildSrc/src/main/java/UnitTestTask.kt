@@ -1,15 +1,16 @@
 import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.getByName
 
 abstract class UnitTestTask: Test() {
     init {
-        filter {
-            excludeTestsMatching("com.arkade.e2e.*")
-            includeTestsMatching("*")
-        }
+        val jvmTestTask = project.tasks.getByName<Test>("jvmTest")
+        jvmTestTask.excludeE2ETests()
 
-        failFast = true
+        val androidTestTask = project.tasks.getByName<Test>("testAndroidHostTest")
+        androidTestTask.excludeE2ETests()
 
-        testLogging.showStandardStreams = true
+        dependsOn(jvmTestTask)
+        dependsOn(androidTestTask)
 
         doFirst {
             logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
@@ -21,6 +22,13 @@ abstract class UnitTestTask: Test() {
             logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
             logger.quiet("✓ All unit tests passed")
             logger.quiet("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+        }
+    }
+
+    fun Test.excludeE2ETests() {
+        filter {
+            excludeTestsMatching("com.arkade.e2e.*")
+            includeTestsMatching("*")
         }
     }
 }

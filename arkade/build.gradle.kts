@@ -125,12 +125,7 @@ tasks.register<E2ETestTask>("testE2EDocker") {
 
 tasks.register<BuildDockerTestTask>("buildDocker")
 
-tasks.register<UnitTestTask>("testUnit") {
-    val jvmTestTask = tasks.named<Test>("jvmTest").get()
-    val androidTestTask = tasks.named<Test>("testAndroidHostTest").get()
-    testClassesDirs = jvmTestTask.testClassesDirs + androidTestTask.testClassesDirs
-    classpath = jvmTestTask.classpath + androidTestTask.classpath
-}
+tasks.register<UnitTestTask>("testUnit")
 
 tasks.androidPreBuild.dependsOn("ktlintCheck")
 tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")
