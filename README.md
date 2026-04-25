@@ -95,7 +95,7 @@ import com.arkade.network.ArkadeClientImpl
 import com.arkade.network.Config
 
 fun main() = runBlocking {
-    val secret = "secret"
+    val secret = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
     val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
     val serverInfo = client.getInfo()
     val wallet = Wallet.create(secret, null, serverInfo)

@@ -58,7 +58,7 @@ interface Wallet {
                 val repo: WalletRepo = WalletRepoImpl(testDb)
                 repo.init()
 
-                if (secret.startsWith(NSEC_HRP, true)) {
+                if (secret.startsWith(NSEC_HRP)) {
                     createNSecWallet(secret, destination, repo)
                 } else {
                     createHDWallet(secret, destination, serverInfo, repo)
@@ -77,7 +77,7 @@ interface Wallet {
 
         fun getOutputDescriptorFromNSec(nsec: String): String {
             val privateKey = getPrivateKeyFromNSec(nsec)
-            return "tr(${privateKey.publicKey().toHex()})"
+            return "tr(${privateKey.publicKey().xOnly().value.toHex()})"
         }
 
         private fun createNSecWallet(
@@ -98,12 +98,16 @@ interface Wallet {
         }
 
         private fun createHDWallet(
-            mnemonic: String,
+            mnemonics: String,
             destination: String?,
             serverInfo: ArkServerInfo,
             repo: WalletRepo,
         ): Wallet {
-            val seed = MnemonicCode.toSeed(mnemonic, "")
+            runCatching {
+                MnemonicCode.validate(mnemonics)
+            }.onFailure { throw it }
+
+            val seed = MnemonicCode.toSeed(mnemonics, "")
             val masterKey = DeterministicWallet.generate(seed)
 
             fun encodePubKeyByNetwork(
@@ -111,10 +115,10 @@ interface Wallet {
                 network: Network,
             ): String =
                 when (network) {
-                    Network.MAINNET -> pubKey.encode(DeterministicWallet.xpub)
+                    Network.MAINNET -> pubKey.encode(false)
                     else -> pubKey.encode(true)
                 }
-            val fingerprint = masterKey.extendedPublicKey.fingerprint().toHexString()
+            val fingerprint = masterKey.extendedPublicKey.fingerprint().toString(16)
             val coinType =
                 when (serverInfo.network) {
                     Network.MAINNET -> 0
@@ -128,7 +132,7 @@ interface Wallet {
             return WalletImpl(
                 repo,
                 accountDescriptor,
-                mnemonic,
+                mnemonics,
                 destination,
                 Type.HD,
                 accountDescriptor,

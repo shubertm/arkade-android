@@ -143,7 +143,7 @@ class HDWalletTest : WalletTest() {
     @Test
     override fun should_create_wallet_successfully() {
         runTest {
-            val secret = "secret"
+            val secret = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
             val wallet =
                 Wallet.create(
                     secret,
@@ -182,11 +182,11 @@ class HDWalletTest : WalletTest() {
         runTest {
             val secrets =
                 listOf(
-                    "secret",
-                    "secret1",
-                    "secret2",
-                    "secret3",
-                    "secret4",
+                    "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+                    "legal winner thank year wave sausage worth useful legal winner thank yellow",
+                    "letter advice cage absurd amount doctor acoustic avoid letter advice cage above",
+                    "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong",
+                    "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon agent",
                 )
             val wallets = mutableListOf<Wallet>()
             for (secret in secrets) {
