@@ -10,6 +10,7 @@ import com.arkade.storage.db.entities.WalletEntity
 import fr.acinq.bitcoin.Bech32
 import fr.acinq.bitcoin.DeterministicWallet
 import fr.acinq.bitcoin.KeyPath
+import fr.acinq.bitcoin.MnemonicCode
 import fr.acinq.bitcoin.PrivateKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -102,7 +103,8 @@ interface Wallet {
             serverInfo: ArkServerInfo,
             repo: WalletRepo,
         ): Wallet {
-            val masterKey = DeterministicWallet.generate(mnemonic.encodeToByteArray())
+            val seed = MnemonicCode.toSeed(mnemonic, "")
+            val masterKey = DeterministicWallet.generate(seed)
 
             fun encodePubKeyByNetwork(
                 pubKey: DeterministicWallet.ExtendedPublicKey,
@@ -112,7 +114,7 @@ interface Wallet {
                     Network.MAINNET -> pubKey.encode(DeterministicWallet.xpub)
                     else -> pubKey.encode(true)
                 }
-            val fingerprint = encodePubKeyByNetwork(masterKey.extendedPublicKey, serverInfo.network)
+            val fingerprint = masterKey.extendedPublicKey.fingerprint().toHexString()
             val coinType =
                 when (serverInfo.network) {
                     Network.MAINNET -> 0
