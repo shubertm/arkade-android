@@ -80,14 +80,11 @@ import com.arkade.network.ArkadeClientImpl
 import com.arkade.network.Config
 
 
-fun main() {
-    val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    coroutineScope.launch {
-        val nsec = "nsec1wr49duqpjavggh78ewu9zlcuvw5huh6x5kqweqwnmjgw78kqqt6qsk0w9k"
-        val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
-        val serverInfo = client.getInfo()
-        val wallet = Wallet.create(nsec, null, serverInfo)
-    }                                                                   
+fun main() = runBlocking {
+    val nsec = "<nsec1...>"
+    val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
+    val serverInfo = client.getInfo()
+    val wallet = Wallet.create(nsec, null, serverInfo)
 }
 ```
 **HD**
@@ -97,14 +94,11 @@ import com.arkade.network.ArkadeClient
 import com.arkade.network.ArkadeClientImpl
 import com.arkade.network.Config
 
-fun main() {
-    val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    coroutineScope.launch {
-        val secret = "secret"
-        val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
-        val serverInfo = client.getInfo()
-        val wallet = Wallet.create(secret, null, serverInfo)
-    }
+fun main() = runBlocking {
+    val secret = "secret"
+    val client: ArkadeClient = ArkadeClientImpl(Config.MUTINYNET)
+    val serverInfo = client.getInfo()
+    val wallet = Wallet.create(secret, null, serverInfo)
 }
 ```
 
