@@ -13,20 +13,21 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
-expect open class WalletTest() {
+expect abstract class WalletTest() {
     val testDb: Database
 
     @AfterTest
-    open fun cleanup()
+    abstract fun cleanup()
 
     @Test
-    open fun should_create_wallet_successfully()
+    abstract fun should_create_wallet_successfully()
 
     @Test
-    open fun should_load_more_wallets_successfully()
+    abstract fun should_load_more_wallets_successfully()
 }
 
 fun getArkServerInfo(): ArkServerInfo =
@@ -84,9 +85,9 @@ class SingleKeyWalletTest : WalletTest() {
 
             wallet.save()
 
-            val loadedWallet = Wallet.loadById(wallet.id, testDb)
+            val loadedWallet = assertNotNull(Wallet.loadById(wallet.id, testDb))
 
-            assertEquals(wallet.id, loadedWallet?.id!!)
+            assertEquals(wallet.id, loadedWallet.id)
             assertEquals(wallet.secret, loadedWallet.secret)
             assertEquals(wallet.destination, loadedWallet.destination)
             assertEquals(wallet.type, loadedWallet.type)
@@ -155,9 +156,9 @@ class HDWalletTest : WalletTest() {
 
             wallet.save()
 
-            val loadedWallet = Wallet.loadById(wallet.id, testDb)
+            val loadedWallet = assertNotNull(Wallet.loadById(wallet.id, testDb))
 
-            assertEquals(wallet.id, loadedWallet?.id!!)
+            assertEquals(wallet.id, loadedWallet.id)
             assertEquals(wallet.secret, loadedWallet.secret)
             assertEquals(wallet.destination, loadedWallet.destination)
             assertEquals(wallet.type, loadedWallet.type)
