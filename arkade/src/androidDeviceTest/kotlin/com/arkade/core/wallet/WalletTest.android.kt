@@ -5,7 +5,7 @@ import com.arkade.storage.db.initializeTestDb
 import kotlin.test.AfterTest
 import kotlin.test.Test
 
-actual abstract class WalletTest actual constructor() {
+actual abstract class WalletTest actual constructor() : com.arkade.Test() {
     actual val testDb: Database = initializeTestDb()
 
     @AfterTest

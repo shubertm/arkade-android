@@ -1,13 +1,10 @@
 package com.arkade.core.wallet
 
 import com.arkade.storage.db.initializeTestDb
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 import kotlin.test.AfterTest
 import kotlin.test.Test
 
-@RunWith(RobolectricTestRunner::class)
-actual abstract class WalletTest actual constructor() {
+actual abstract class WalletTest actual constructor() : com.arkade.Test() {
     actual val testDb = initializeTestDb()
 
     @AfterTest

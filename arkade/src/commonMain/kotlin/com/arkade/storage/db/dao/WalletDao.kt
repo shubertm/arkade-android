@@ -2,13 +2,14 @@ package com.arkade.storage.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.arkade.storage.db.entities.WalletEntity
 
 @Dao
 interface WalletDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(wallet: WalletEntity)
 
     @Query("SELECT * FROM wallets WHERE id = :id")

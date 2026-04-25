@@ -17,7 +17,7 @@ import kotlin.test.assertNotNull
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
-expect abstract class WalletTest() {
+expect abstract class WalletTest() : com.arkade.Test {
     val testDb: Database
 
     @AfterTest
