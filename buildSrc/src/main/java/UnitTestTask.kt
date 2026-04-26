@@ -1,7 +1,8 @@
+import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.getByName
 
-abstract class UnitTestTask: Test() {
+abstract class UnitTestTask: DefaultTask() {
     init {
         val jvmTestTask = project.tasks.getByName<Test>("jvmTest")
         jvmTestTask.excludeE2ETests()
