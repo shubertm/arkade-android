@@ -20,10 +20,6 @@ abstract class UnitTestTask: DefaultTask() {
         }
 
         doLast {
-            // Reset all mutated tests to their original state
-            jvmTestTask.includeE2ETests()
-            androidTestTask.includeE2ETests()
-
             logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
             logger.quiet("✓ All unit tests passed")
             logger.quiet("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
@@ -34,14 +30,6 @@ abstract class UnitTestTask: DefaultTask() {
         configure {
             filter {
                 excludeTestsMatching("com.arkade.e2e.*")
-            }
-        }
-    }
-
-    private fun TaskProvider<Test>.includeE2ETests() {
-        configure {
-            filter {
-                includeTestsMatching("com.arkade.e2e.*")
             }
         }
     }
