@@ -11,13 +11,15 @@ abstract class UnitTestTask: DefaultTask() {
         val androidTestTask = project.tasks.named<Test>("testAndroidHostTest")
         androidTestTask.excludeE2ETests()
 
-        dependsOn(jvmTestTask, androidTestTask)
-
-        doFirst {
-            logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-            logger.quiet("Running all unit tests...")
-            logger.quiet("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+        jvmTestTask.configure {
+            doFirst {
+                logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+                logger.quiet("Running all unit tests...")
+                logger.quiet("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+            }
         }
+
+        dependsOn(jvmTestTask, androidTestTask)
 
         doLast {
             logger.quiet("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
