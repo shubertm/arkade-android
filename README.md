@@ -93,6 +93,13 @@ Please note that this project is **experimental**, so expect frequent changes.
 
 ---
 
+## Development Environment
+
+### Setup Precommit Hook
+```shell
+cp scripts/pre-commit .git/hooks/
+```
+
 ## Testing
 
 ### Unit
