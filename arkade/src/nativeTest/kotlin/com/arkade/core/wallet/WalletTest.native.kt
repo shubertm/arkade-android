@@ -8,6 +8,11 @@ import kotlin.test.Test
 actual abstract class WalletTest actual constructor() : com.arkade.Test() {
     actual val testDb: Database = initializeTestDb()
 
+    /**
+     * Performs test-specific teardown after each test execution.
+     *
+     * Implementations should release or reset any resources, persistent state, or test data associated with the test instance.
+     */
     @AfterTest
     actual abstract fun cleanup()
 

@@ -3,13 +3,38 @@ package com.arkade.core.wallet
 import com.arkade.storage.db.entities.WalletEntity
 
 interface Storage {
-    suspend fun loadWalletById(id: String): WalletEntity?
+    /**
+ * Loads the wallet with the given identifier.
+ *
+ * @param id The wallet's identifier.
+ * @return `WalletEntity` if a wallet with the specified `id` exists, `null` otherwise.
+ */
+suspend fun loadWalletById(id: String): WalletEntity?
 
-    suspend fun loadWallets(): List<WalletEntity>
+    /**
+ * Loads all persisted wallets.
+ *
+ * @return A list of stored WalletEntity objects; an empty list if no wallets are found.
+ */
+suspend fun loadWallets(): List<WalletEntity>
 
-    suspend fun saveWallet(wallet: WalletEntity)
+    /**
+ * Persists the given wallet entity into storage.
+ *
+ * @param wallet The WalletEntity to be saved.
+suspend fun saveWallet(wallet: WalletEntity)
 
-    suspend fun deleteWallet(id: String)
+    /**
+ * Deletes the persisted wallet with the specified id.
+ *
+ * @param id The identifier of the wallet to delete.
+ */
+suspend fun deleteWallet(id: String)
 
-    suspend fun updateWallet(wallet: WalletEntity)
+    /**
+ * Updates an existing wallet record with the provided wallet data.
+ *
+ * @param wallet The WalletEntity whose fields will replace the stored record identified by its `id`.
+ */
+suspend fun updateWallet(wallet: WalletEntity)
 }
