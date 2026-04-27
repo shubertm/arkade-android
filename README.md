@@ -114,13 +114,20 @@ Please note that this project is **experimental**, so expect frequent changes.
 
 ---
 
-## Testing
+### Development Environment
 
-### Unit
+#### Setup Pre-commit Hook
+```shell
+cp scripts/pre-commit .git/hooks/
+```
+
+### Testing
+
+#### Unit
 ```shell
 ./gradlew testUnit
 ```
-### Integration
+#### Integration
 - Install Nigiri
     ```shell
     curl https://getnigiri.vulpem.com | bash
@@ -137,6 +144,7 @@ Please note that this project is **experimental**, so expect frequent changes.
     ```shell
     nigiri stop --delete
     ```
+---
 
 ## License
 This project is licensed under the **MIT License**. See the [License](./LICENSE) file for details.
