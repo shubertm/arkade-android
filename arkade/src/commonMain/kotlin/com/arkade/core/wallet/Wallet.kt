@@ -26,14 +26,42 @@ interface Wallet {
 
     val repo: WalletRepo
 
+    /**
+     * Persist the wallet's current state to its configured repository.
+     *
+     * This operation ensures the wallet's properties (id, secret, destination, type,
+     * accountDescriptor, lastUsedIndex) are stored or updated in persistent storage.
+     */
     suspend fun save()
 
+    /**
+     * Delete this wallet from persistent storage.
+     *
+     * Performs the repository-level removal so the wallet is no longer stored.
+     */
     suspend fun delete()
 
+    /**
+     * Update the persisted wallet record to match the wallet's current state.
+     *
+     * Persists the wallet's properties (for example: `secret`, `destination`, `type`,
+     * `accountDescriptor`, and `lastUsedIndex`) to the configured repository.
+     */
     suspend fun update()
 
+    /**
+     * Set the wallet's last used address index and persist the change.
+     *
+     * @param index The new last-used address index (must be greater than or equal to 0).
+     */
     suspend fun updateLastUsedIndex(index: Int)
 
+    /**
+     * Converts this wallet into a Room persistence entity.
+     *
+     * @return A `WalletEntity` containing this wallet's `id`, `secret`, optional `destination`,
+     * `type`, `accountDescriptor`, and `lastUsedIndex`.
+     */
     fun toRoomEntity(): WalletEntity = WalletEntity(id, secret, destination, type, accountDescriptor, lastUsedIndex)
 
     enum class Type {
@@ -44,6 +72,21 @@ interface Wallet {
     companion object {
         private const val NSEC_HRP = "nsec"
 
+        /**
+         * Create a Wallet from a secret (mnemonic phrase or an nsec-encoded private key) and an
+         * optional destination tied to the provided server information.
+         *
+         * @param secret Either an HD mnemonic phrase or an nsec-encoded private key
+         * (prefix "nsec"); when `secret` starts with `nsec`, a single-key wallet is created,
+         * otherwise an HD wallet is created.
+         * @param destination Optional [ArkAddress] for the wallet; when provided, the destination
+         * is validated against `serverInfo`.
+         * @param serverInfo Server information used to validate the destination and to derive
+         * network-specific values for HD wallet creation.
+         * @param testDb Optional in-memory or test database passed to the repository for
+         * initialization.
+         * @return The created [Wallet] instance.
+         */
         suspend fun create(
             secret: String,
             destination: String? = null,
@@ -65,6 +108,14 @@ interface Wallet {
                 }
             }
 
+        /**
+         * Load a wallet by its identifier from persistent storage.
+         *
+         * @param id The wallet identifier to look up.
+         * @param testDb Optional database instance used for repository initialization
+         * (primarily for tests).
+         * @return The wallet with the given `id`, or `null` if no matching wallet is found.
+         */
         suspend fun loadById(
             id: String,
             testDb: Database? = null,
@@ -75,11 +126,26 @@ interface Wallet {
                 repo.loadWalletById(id)
             }
 
+        /**
+         * Builds a Taproot output descriptor from an nsec-encoded private key.
+         *
+         * @param nsec The nsec (Bech32) encoded private key string.
+         * @return A Taproot output descriptor in the form `tr(<xOnlyPublicKeyHex>)`.
+         */
         fun getOutputDescriptorFromNSec(nsec: String): String {
             val privateKey = getPrivateKeyFromNSec(nsec)
             return "tr(${privateKey.publicKey().xOnly().value.toHex()})"
         }
 
+        /**
+         * Creates a single-key wallet backed by the provided nsec-encoded private key.
+         *
+         * @param nsec The nsec-encoded private key string.
+         * @param destination Optional destination address associated with the wallet.
+         * @param repo Repository instance used by the returned wallet for persistence.
+         * @return A [Wallet] initialized with a Taproot output descriptor derived from `nsec`,
+         * [Type.SINGLE_KEY], and `lastUsedIndex` set to 0.
+         */
         private fun createNSecWallet(
             nsec: String,
             destination: String?,
@@ -97,6 +163,19 @@ interface Wallet {
             )
         }
 
+        /**
+         * Creates an HD wallet from the provided mnemonic phrase and server information.
+         *
+         * Derives the Taproot account descriptor for the wallet using the server's network
+         * and returns a [Wallet] configured as an HD wallet with `lastUsedIndex` set to 0.
+         *
+         * @param mnemonics The mnemonic phrase to validate and use as the wallet seed.
+         * @param destination Optional destination address associated with the wallet.
+         * @param serverInfo Server network and signing information used to choose coin type
+         * and key encoding.
+         * @param repo Repository used by the returned Wallet for persistence.
+         * @return A [Wallet] instance of type `HD` with a derived Taproot account descriptor.
+         */
         private fun createHDWallet(
             mnemonics: String,
             destination: String?,
@@ -144,6 +223,17 @@ interface Wallet {
             )
         }
 
+        /**
+         * Validates that the provided Ark address targets the given server by comparing server
+         * public keys.
+         *
+         * @param address Bech32-encoded [ArkAddress] whose embedded server public key will be
+         * checked.
+         * @param serverInfo Server information whose `signerPubKey` must match the address's
+         * server public key.
+         * @throws IllegalArgumentException if the address's server public key does not match
+         * `serverInfo.signerPubKey`.
+         */
         private fun validateDestination(
             address: String,
             serverInfo: ArkServerInfo,
@@ -157,6 +247,14 @@ interface Wallet {
             }
         }
 
+        /**
+         * Decodes a Bech32 `nsec` string and returns the corresponding private key.
+         *
+         * @param nsec The Bech32-encoded secret (expected HRP "nsec").
+         * @return The private key represented by the decoded nsec payload.
+         * @throws IllegalArgumentException If the HRP is not "nsec" or the decoded payload
+         * is not 32 bytes.
+         */
         private fun getPrivateKeyFromNSec(nsec: String): PrivateKey {
             val (hrp, bytes, _) = Bech32.decodeBytes(nsec)
             require(hrp == NSEC_HRP) { "Invalid nsec HRP: $hrp" }

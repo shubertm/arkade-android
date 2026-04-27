@@ -16,5 +16,12 @@ data class WalletEntity(
     val accountDescriptor: String,
     val lastUsedIndex: Int,
 ) {
+    /**
+     * Constructs a [Wallet] instance from this entity using the provided repository.
+     *
+     * @param repo Repository used by the created [Wallet] for persistence and operations.
+     * @return A [Wallet] initialized with this entity's `id`, `secret`, `destination`, `type`,
+     * `accountDescriptor`, and `lastUsedIndex`.
+     */
     fun toWallet(repo: WalletRepo): Wallet = WalletImpl(repo, id, secret, destination, type, accountDescriptor, lastUsedIndex)
 }
