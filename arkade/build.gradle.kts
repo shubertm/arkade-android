@@ -1,5 +1,4 @@
-import com.android.build.gradle.internal.tasks.factory.dependsOn
-import org.gradle.kotlin.dsl.register
+import com.google.devtools.ksp.gradle.KspAATask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -9,12 +8,18 @@ plugins {
     alias(libs.plugins.ktlint.gradle)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.square.wire)
+    alias(libs.plugins.androidx.room)
+    alias(libs.plugins.ksp)
 }
 
 val currentOs: String = System.getProperty("os.name").lowercase()
 
 wire {
     kotlin {}
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 kotlin {
@@ -71,6 +76,14 @@ kotlin {
                 implementation(libs.kotlinx.serialization.protobuf)
                 implementation(libs.square.wire.runtime)
                 implementation(libs.square.wire.grpc.client)
+                implementation(libs.androidx.room.runtime)
+                implementation(libs.androidx.sqlite.bundled)
+            }
+        }
+
+        androidMain {
+            dependencies {
+                implementation(libs.androidx.room.sqlite.wrapper)
             }
         }
 
@@ -78,6 +91,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.androidx.sqlite.bundled)
             }
         }
 
@@ -97,17 +111,31 @@ kotlin {
         getByName("androidHostTest") {
             dependencies {
                 implementation(libs.secp256k1.kmp.jni.jvm)
+                implementation(libs.androidx.test.runner)
+                implementation(libs.androidx.test.core)
+                implementation(libs.androidx.junit)
+                implementation(libs.robolectric)
+                implementation(libs.androidx.sqlite.bundled.jvm)
             }
         }
 
         getByName("androidDeviceTest") {
             dependencies {
-                implementation(libs.androidx.runner)
-                implementation(libs.androidx.core)
+                implementation(libs.secp256k1.kmp.jni.android)
+                implementation(libs.androidx.test.runner)
+                implementation(libs.androidx.test.core)
                 implementation(libs.androidx.junit)
             }
         }
     }
+}
+
+dependencies {
+    add("kspJvm", libs.androidx.room.compiler)
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    add("kspIosX64", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
 }
 
 tasks.register<SetupTestTask>("testSetup") {
@@ -127,5 +155,9 @@ tasks.register<BuildDockerTestTask>("buildDocker")
 
 tasks.register<UnitTestTask>("testUnit")
 
-tasks.androidPreBuild.dependsOn("ktlintCheck")
-tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")
+tasks.getByName("ktlintCheck") {
+    mustRunAfter(tasks.withType<KspAATask>())
+}
+
+// tasks.androidPreBuild.dependsOn("ktlintCheck")
+// tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")

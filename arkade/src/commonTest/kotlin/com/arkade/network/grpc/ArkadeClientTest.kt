@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
-class ArkadeClientTest {
+class ArkadeClientTest : com.arkade.Test() {
     @Test
     fun can_fetch_server_info_from_mainnet() =
         runTest {
