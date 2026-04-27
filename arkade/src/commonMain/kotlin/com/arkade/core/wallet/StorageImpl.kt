@@ -51,6 +51,10 @@ internal class StorageImpl private constructor(
      */
     override suspend fun updateWallet(wallet: WalletEntity) = walletDao.update(wallet)
 
+    internal fun close() {
+        db.close()
+    }
+
     companion object {
         private var storage: Storage? = null
         private var testStorage: Storage? = null
@@ -85,6 +89,7 @@ internal class StorageImpl private constructor(
          */
         @VisibleForTesting
         fun reset() {
+            (testStorage as StorageImpl).close()
             testStorage = null
         }
     }
