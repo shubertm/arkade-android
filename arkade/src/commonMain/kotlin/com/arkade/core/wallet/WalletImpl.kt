@@ -12,19 +12,19 @@ class WalletImpl(
     override var lastUsedIndex: Int,
 ) : Wallet {
     /**
- * Persists this wallet to the configured repository.
- */
-override suspend fun save() = repo.saveWallet(this)
+     * Persists this wallet to the configured repository.
+     */
+    override suspend fun save() = repo.saveWallet(this)
 
     /**
- * Delete this wallet from the repository.
- */
-override suspend fun delete() = repo.deleteWallet(id)
+     * Delete this wallet from the repository.
+     */
+    override suspend fun delete() = repo.deleteWallet(id)
 
     /**
- * Persists the wallet's current state to the configured repository.
- */
-override suspend fun update() = repo.updateWallet(this)
+     * Persists the wallet's current state to the configured repository.
+     */
+    override suspend fun update() = repo.updateWallet(this)
 
     /**
      * Set the wallet's lastUsedIndex to `index` and attempt to persist the change.

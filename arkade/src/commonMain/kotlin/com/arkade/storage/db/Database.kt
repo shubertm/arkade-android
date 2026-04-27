@@ -15,19 +15,19 @@ import com.arkade.storage.db.entities.WalletEntity
 @ConstructedBy(DatabaseConstructor::class)
 abstract class Database : RoomDatabase() {
     /**
- * Provides access to the DAO responsible for wallet persistence operations.
- *
- * @return The `WalletDao` used to read and modify wallet entities in this database.
- */
-abstract fun walletDao(): WalletDao
+     * Provides access to the DAO responsible for wallet persistence operations.
+     *
+     * @return The [WalletDao] used to read and modify wallet entities in this database.
+     */
+    abstract fun walletDao(): WalletDao
 }
 
 @Suppress("NO_ACTUAL_FOR_EXPECT")
 expect object DatabaseConstructor : RoomDatabaseConstructor<com.arkade.storage.db.Database> {
     /**
- * Constructs and configures the platform-specific database used by the storage layer.
- *
- * @return An initialized com.arkade.storage.db.Database instance.
- */
-override fun initialize(): com.arkade.storage.db.Database
+     * Constructs and configures the platform-specific database used by the storage layer.
+     *
+     * @return An initialized [com.arkade.storage.db.Database] instance.
+     */
+    override fun initialize(): com.arkade.storage.db.Database
 }

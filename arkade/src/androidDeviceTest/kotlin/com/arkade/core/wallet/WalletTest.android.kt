@@ -11,7 +11,8 @@ actual abstract class WalletTest actual constructor() : com.arkade.Test() {
     /**
      * Executes after each test to perform test-specific cleanup.
      *
-     * Implementations must release resources and restore any shared state created or modified by the test.
+     * Implementations must release resources and restore any shared state created or modified by
+     * the test.
      */
     @AfterTest
     actual abstract fun cleanup()

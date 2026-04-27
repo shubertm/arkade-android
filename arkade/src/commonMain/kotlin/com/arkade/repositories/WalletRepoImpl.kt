@@ -13,7 +13,8 @@ internal class WalletRepoImpl(
     /**
      * Initializes the repository's internal storage backing.
      *
-     * If the repository was constructed with a test database, that database will be used to initialize the storage.
+     * If the repository was constructed with a test database, that database will be used to
+     * initialize the storage.
      */
     override suspend fun init() {
         storage = StorageImpl.get(testDb)
@@ -40,21 +41,21 @@ internal class WalletRepoImpl(
     }
 
     /**
-         * Load all wallets from storage and convert each stored entity into a domain Wallet.
-         *
-         * @return A list of Wallet objects; empty list if no wallets are stored.
-         */
-        override suspend fun loadWallets(): List<Wallet> =
+     * Load all wallets from storage and convert each stored entity into a domain Wallet.
+     *
+     * @return A list of [Wallet] objects; empty list if no wallets are stored.
+     */
+    override suspend fun loadWallets(): List<Wallet> =
         storage.loadWallets().map { entity ->
             entity.toWallet(this)
         }
 
     /**
- * Deletes the wallet with the specified identifier from persistent storage.
- *
- * @param id The wallet's unique identifier.
- */
-override suspend fun deleteWallet(id: String) = storage.deleteWallet(id)
+     * Deletes the wallet with the specified identifier from persistent storage.
+     *
+     * @param id The wallet's unique identifier.
+     */
+    override suspend fun deleteWallet(id: String) = storage.deleteWallet(id)
 
     /**
      * Updates the persisted representation of an existing wallet.
