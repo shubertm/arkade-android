@@ -1,4 +1,3 @@
-import com.google.devtools.ksp.gradle.KspAATask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -154,10 +153,3 @@ tasks.register<E2ETestTask>("testE2EDocker") {
 tasks.register<BuildDockerTestTask>("buildDocker")
 
 tasks.register<UnitTestTask>("testUnit")
-
-tasks.getByName("ktlintCheck") {
-    mustRunAfter(tasks.withType<KspAATask>())
-}
-
-// tasks.androidPreBuild.dependsOn("ktlintCheck")
-// tasks.getByName("compileKotlinJvm").dependsOn("ktlintCheck")
