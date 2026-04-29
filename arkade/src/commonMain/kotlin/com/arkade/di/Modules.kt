@@ -8,10 +8,10 @@ import org.koin.dsl.module
 
 val storageModule =
     module {
-        single<Storage> { params -> StorageImpl(params.get()) }
+        factory<Storage> { params -> StorageImpl(params.get()) }
     }
 
 val repoModule =
     module {
-        single<WalletRepo> { params -> WalletRepoImpl(params.get()) }
+        factory<WalletRepo> { params -> WalletRepoImpl(params.get()) }
     }
