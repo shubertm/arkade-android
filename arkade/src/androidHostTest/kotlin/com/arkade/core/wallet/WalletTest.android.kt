@@ -1,20 +1,10 @@
 package com.arkade.core.wallet
 
 import com.arkade.storage.db.initializeTestDb
-import kotlin.test.AfterTest
 import kotlin.test.Test
 
 actual abstract class WalletTest actual constructor() : com.arkade.Test() {
     actual val testDb = initializeTestDb()
-
-    /**
-     * Cleans up resources and resets state after each test.
-     *
-     * Implementations should release any resources, clear test-specific data, and restore global
-     * or shared state to ensure tests are isolated.
-     */
-    @AfterTest
-    actual abstract fun cleanup()
 
     /**
      * Verifies that a wallet can be created successfully and stored in the test database.

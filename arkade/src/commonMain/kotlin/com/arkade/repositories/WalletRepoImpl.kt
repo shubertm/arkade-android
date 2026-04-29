@@ -1,24 +1,15 @@
 package com.arkade.repositories
 
 import com.arkade.core.wallet.Storage
-import com.arkade.core.wallet.StorageImpl
 import com.arkade.core.wallet.Wallet
+import com.arkade.di.ArkadeDI
 import com.arkade.storage.db.Database
+import org.koin.core.parameter.parametersOf
 
 internal class WalletRepoImpl(
     private val testDb: Database? = null,
 ) : WalletRepo {
-    private lateinit var storage: Storage
-
-    /**
-     * Initializes the repository's internal storage backing.
-     *
-     * If the repository was constructed with a test database, that database will be used to
-     * initialize the storage.
-     */
-    override suspend fun init() {
-        storage = StorageImpl.get(testDb)
-    }
+    private val storage: Storage = ArkadeDI.arkadeKoin.get { parametersOf(testDb) }
 
     /**
      * Persists the given wallet into the repository's storage.
