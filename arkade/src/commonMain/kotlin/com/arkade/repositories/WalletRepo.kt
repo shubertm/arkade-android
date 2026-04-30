@@ -4,11 +4,6 @@ import com.arkade.core.wallet.Wallet
 
 interface WalletRepo {
     /**
-     * Performs repository startup tasks and prepares the wallet repository for use.
-     */
-    suspend fun init()
-
-    /**
      * Persists the given wallet in the repository.
      *
      * @param wallet The wallet to persist. Implementations should store the wallet

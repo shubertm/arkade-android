@@ -77,12 +77,14 @@ kotlin {
                 implementation(libs.square.wire.grpc.client)
                 implementation(libs.androidx.room.runtime)
                 implementation(libs.androidx.sqlite.bundled)
+                implementation(libs.koin.core)
             }
         }
 
         androidMain {
             dependencies {
                 implementation(libs.androidx.room.sqlite.wrapper)
+                implementation(libs.koin.android)
             }
         }
 
@@ -90,6 +92,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.koin.test)
                 implementation(libs.androidx.sqlite.bundled)
             }
         }

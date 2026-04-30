@@ -3,8 +3,8 @@ package com.arkade.core.wallet
 import com.arkade.core.ArkAddress
 import com.arkade.core.ArkServerInfo
 import com.arkade.core.bitcoin.Network
+import com.arkade.di.ArkadeDI
 import com.arkade.repositories.WalletRepo
-import com.arkade.repositories.WalletRepoImpl
 import com.arkade.storage.db.Database
 import com.arkade.storage.db.entities.WalletEntity
 import fr.acinq.bitcoin.Bech32
@@ -15,6 +15,7 @@ import fr.acinq.bitcoin.PrivateKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import org.koin.core.parameter.parametersOf
 
 interface Wallet {
     val id: String
@@ -98,8 +99,7 @@ interface Wallet {
                     validateDestination(destination, serverInfo)
                 }
 
-                val repo: WalletRepo = WalletRepoImpl(testDb)
-                repo.init()
+                val repo: WalletRepo = ArkadeDI.arkadeKoin.get { parametersOf(testDb) }
 
                 if (secret.startsWith(NSEC_HRP)) {
                     createNSecWallet(secret, destination, repo)
@@ -121,8 +121,7 @@ interface Wallet {
             testDb: Database? = null,
         ): Wallet? =
             withContext(Dispatchers.IO) {
-                val repo: WalletRepo = WalletRepoImpl(testDb)
-                repo.init()
+                val repo: WalletRepo = ArkadeDI.arkadeKoin.get { parametersOf(testDb) }
                 repo.loadWalletById(id)
             }
 

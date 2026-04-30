@@ -6,11 +6,11 @@ import com.arkade.core.bitcoin.Hrp
 import com.arkade.core.bitcoin.Network
 import com.arkade.core.bitcoin.WitnessVersion
 import com.arkade.core.toXOnlyPubKey
+import com.arkade.di.ArkadeDI
 import com.arkade.repositories.WalletRepo
-import com.arkade.repositories.WalletRepoImpl
 import com.arkade.storage.db.Database
 import kotlinx.coroutines.test.runTest
-import kotlin.test.AfterTest
+import org.koin.core.parameter.parametersOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -19,9 +19,6 @@ import kotlin.time.Duration.Companion.minutes
 
 expect abstract class WalletTest() : com.arkade.Test {
     val testDb: Database
-
-    @AfterTest
-    abstract fun cleanup()
 
     @Test
     abstract fun should_create_wallet_successfully()
@@ -62,13 +59,6 @@ fun getArkServerInfo(): ArkServerInfo =
 
 class SingleKeyWalletTest : WalletTest() {
     private val serverInfo = getArkServerInfo()
-
-    @AfterTest
-    override fun cleanup() {
-        runTest {
-            StorageImpl.reset()
-        }
-    }
 
     @Test
     override fun should_create_wallet_successfully() {
@@ -117,8 +107,7 @@ class SingleKeyWalletTest : WalletTest() {
                 wallet.save()
             }
 
-            val repo: WalletRepo = WalletRepoImpl(testDb)
-            repo.init()
+            val repo: WalletRepo = ArkadeDI.arkadeKoin.get { parametersOf(testDb) }
 
             val loadedWallets = repo.loadWallets().filter { w -> w.type == Wallet.Type.SINGLE_KEY }
 
@@ -134,11 +123,6 @@ class SingleKeyWalletTest : WalletTest() {
 
 class HDWalletTest : WalletTest() {
     private val serverInfo = getArkServerInfo()
-
-    @AfterTest
-    override fun cleanup() {
-        runTest { StorageImpl.reset() }
-    }
 
     @Test
     override fun should_create_wallet_successfully() {
@@ -195,8 +179,7 @@ class HDWalletTest : WalletTest() {
                 wallet.save()
             }
 
-            val repo: WalletRepo = WalletRepoImpl(testDb)
-            repo.init()
+            val repo: WalletRepo = ArkadeDI.arkadeKoin.get { parametersOf(testDb) }
 
             val loadedWallets = repo.loadWallets().filter { w -> w.type == Wallet.Type.HD }
 
