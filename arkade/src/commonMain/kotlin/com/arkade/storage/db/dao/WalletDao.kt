@@ -26,7 +26,16 @@ interface WalletDao {
      * @return The matching [WalletEntity] if found, `null` otherwise.
      */
     @Query("SELECT * FROM wallets WHERE id = :id")
-    suspend fun load(id: String): WalletEntity?
+    suspend fun loadById(id: String): WalletEntity?
+
+    /**
+     * Loads a wallet by its fingerprint.
+     *
+     * @param fingerprint The wallet's fingerprint.
+     * @return The matching [WalletEntity] if found, `null` otherwise.
+     */
+    @Query("SELECT * FROM wallets WHERE fingerprint = :fingerprint")
+    suspend fun loadByFingerprint(fingerprint: String): WalletEntity?
 
     /**
      * Retrieves all wallet records from the database.

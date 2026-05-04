@@ -14,9 +14,17 @@ internal class StorageImpl(
      * Retrieve a wallet entity by its identifier.
      *
      * @param id The wallet's unique identifier.
-     * @return The matching WalletEntity if found, `null` if no wallet exists with the given id.
+     * @return The matching WalletEntity if found, `null` if no wallet exists with the given `id`.
      */
-    override suspend fun loadWalletById(id: String): WalletEntity? = walletDao.load(id)
+    override suspend fun loadWalletById(id: String): WalletEntity? = walletDao.loadById(id)
+
+    /**
+     * Retrieve a wallet entity by its `fingerprint`.
+     *
+     * @param fingerprint The wallet's unique identifier.
+     * @return The matching WalletEntity if found, `null` if no wallet exists with the given `fingerprint`.
+     */
+    override suspend fun loadWalletByFingerprint(fingerprint: String): WalletEntity? = walletDao.loadByFingerprint(fingerprint)
 
     /**
      * Retrieves all persisted wallet entities.

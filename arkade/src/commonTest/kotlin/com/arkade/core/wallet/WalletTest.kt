@@ -6,6 +6,7 @@ import com.arkade.core.bitcoin.Hrp
 import com.arkade.core.bitcoin.Network
 import com.arkade.core.bitcoin.WitnessVersion
 import com.arkade.core.toXOnlyPubKey
+import com.arkade.core.wallet.Wallet.Companion.masterKeyFromSecret
 import com.arkade.di.ArkadeDI
 import com.arkade.repositories.WalletRepo
 import com.arkade.storage.db.Database
@@ -149,11 +150,22 @@ class HDWalletTest : WalletTest() {
             assertEquals(wallet.accountDescriptor, loadedWallet.accountDescriptor)
             assertEquals(wallet.lastUsedIndex, loadedWallet.lastUsedIndex)
 
+            val (_, fingerprint) = masterKeyFromSecret(secret)
+
+            val loadedWallet2 = assertNotNull(Wallet.loadByFingerprint(fingerprint, testDb))
+            assertEquals(fingerprint, loadedWallet2.fingerprint())
+            assertEquals(wallet.id, loadedWallet2.id)
+            assertEquals(wallet.secret, loadedWallet2.secret)
+            assertEquals(wallet.destination, loadedWallet2.destination)
+            assertEquals(wallet.type, loadedWallet2.type)
+            assertEquals(wallet.accountDescriptor, loadedWallet2.accountDescriptor)
+            assertEquals(wallet.lastUsedIndex, loadedWallet2.lastUsedIndex)
+
             loadedWallet.updateLastUsedIndex(1)
 
-            val loadedWallet2 = Wallet.loadById(loadedWallet.id, testDb)
+            val loadedWallet3 = assertNotNull(Wallet.loadById(loadedWallet.id, testDb))
 
-            assertEquals(1, loadedWallet2?.lastUsedIndex)
+            assertEquals(1, loadedWallet3.lastUsedIndex)
 
             loadedWallet.delete()
 

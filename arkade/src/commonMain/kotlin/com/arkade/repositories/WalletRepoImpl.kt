@@ -32,6 +32,17 @@ internal class WalletRepoImpl(
     }
 
     /**
+     * Loads a wallet by its `fingerprint`.
+     *
+     * @param fingerprint The wallet's fingerprint.
+     * @return The corresponding `Wallet` if found, `null` otherwise.
+     */
+    override suspend fun loadWalletByFingerprint(fingerprint: String): Wallet? {
+        val entity = storage.loadWalletByFingerprint(fingerprint)
+        return entity?.toWallet(this)
+    }
+
+    /**
      * Load all wallets from storage and convert each stored entity into a domain Wallet.
      *
      * @return A list of [Wallet] objects; empty list if no wallets are stored.
