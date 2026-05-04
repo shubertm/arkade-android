@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
  * Creates an in-memory Room `Database` instance configured for tests.
  *
  * This database is built using the test application `Context`, uses the
- * `Unconfined` coroutine dispatcher for query execution, and is backed by the
+ * `IO` coroutine dispatcher for query execution, and is backed by the
  * bundled SQLite driver so it does not persist to disk.
  *
  * @return A `Database` instance backed by an in-memory Room database suitable for testing.
