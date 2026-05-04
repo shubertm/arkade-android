@@ -21,7 +21,7 @@ internal class StorageImpl(
     /**
      * Retrieve a wallet entity by its `fingerprint`.
      *
-     * @param fingerprint The wallet's unique identifier.
+     * @param fingerprint The wallet's fingerprint.
      * @return The matching WalletEntity if found, `null` if no wallet exists with the given `fingerprint`.
      */
     override suspend fun loadWalletByFingerprint(fingerprint: String): WalletEntity? = walletDao.loadByFingerprint(fingerprint)

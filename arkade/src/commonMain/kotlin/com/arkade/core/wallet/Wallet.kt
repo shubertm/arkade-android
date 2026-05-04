@@ -8,6 +8,7 @@ import com.arkade.repositories.WalletRepo
 import com.arkade.storage.db.Database
 import com.arkade.storage.db.entities.WalletEntity
 import fr.acinq.bitcoin.Bech32
+import fr.acinq.bitcoin.Crypto
 import fr.acinq.bitcoin.DeterministicWallet
 import fr.acinq.bitcoin.KeyPath
 import fr.acinq.bitcoin.MnemonicCode
@@ -79,7 +80,19 @@ interface Wallet {
      *
      * @return The wallet's fingerprint if it exists (`type` is `HD`), `null` otherwise.
      */
-    fun fingerprint(): String? = if (type == Type.HD) accountDescriptor.substringAfter("[").substringBefore("/") else null
+    fun fingerprint(): String? {
+        return if (type == Type.HD) {
+            val startIndex = accountDescriptor.indexOf('[')
+            if (startIndex == -1) return null
+            val endIndex = accountDescriptor.indexOf('/', startIndex + 1)
+            if (endIndex == -1) return null
+            val fingerprint = accountDescriptor.substring(startIndex + 1, endIndex)
+            require(fingerprint.length == 8) { "Invalid fingerprint length: expected 8 but is ${fingerprint.length}" }
+            fingerprint
+        } else {
+            null
+        }
+    }
 
     enum class Type {
         HD,
@@ -178,13 +191,21 @@ interface Wallet {
         fun masterKeyFromSecret(mnemonics: String): Pair<DeterministicWallet.ExtendedPrivateKey, String> {
             val seed = MnemonicCode.toSeed(mnemonics, "")
             val masterKey = DeterministicWallet.generate(seed)
-            val fingerprint =
-                masterKey.extendedPublicKey
-                    .fingerprint()
-                    .toString(16)
-                    .padStart(8, '0')
+            val fingerprint = masterKey.extendedPublicKey.keyFingerprint()
             return masterKey to fingerprint
         }
+
+        /**
+         * Extracts the first 32 bits of RIPEMD160 of SHA256 of a serialized extended public key
+         *
+         * @return A 4 byte hex string fingerprint
+         */
+        fun DeterministicWallet.ExtendedPublicKey.keyFingerprint(): String =
+            Crypto
+                .hash160(publickeybytes)
+                .take(4)
+                .toByteArray()
+                .toHexString()
 
         /**
          * Creates a single-key wallet backed by the provided nsec-encoded private key.
@@ -253,6 +274,7 @@ interface Wallet {
             val accountKeyPath = KeyPath("m/86'/$coinType'/0'")
             val accountPrivateKey = masterKey.derivePrivateKey(accountKeyPath)
             val accountPublicKey = encodePubKeyByNetwork(accountPrivateKey.extendedPublicKey, serverInfo.network)
+            require(fingerprint.length == 8) { "Invalid fingerprint length: expected 8 but is ${fingerprint.length}" }
             val accountDescriptor = "tr([$fingerprint/86'/$coinType'/0']$accountPublicKey/0/*)"
 
             return WalletImpl(

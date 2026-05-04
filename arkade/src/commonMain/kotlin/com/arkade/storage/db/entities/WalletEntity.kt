@@ -1,12 +1,16 @@
 package com.arkade.storage.db.entities
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.arkade.core.wallet.Wallet
 import com.arkade.core.wallet.WalletImpl
 import com.arkade.repositories.WalletRepo
 
-@Entity("wallets")
+@Entity(
+    "wallets",
+    indices = [Index("fingerprint", unique = true)],
+)
 data class WalletEntity(
     @PrimaryKey
     val id: String,

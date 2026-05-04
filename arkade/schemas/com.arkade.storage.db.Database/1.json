@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0c16c340f2ee56347e8d5fc5f3ea2074",
+    "identityHash": "3fb7ec817d38636bae8deb93ee092f63",
     "entities": [
       {
         "tableName": "wallets",
@@ -54,12 +54,23 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_wallets_fingerprint",
+            "unique": true,
+            "columnNames": [
+              "fingerprint"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_wallets_fingerprint` ON `${TABLE_NAME}` (`fingerprint`)"
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0c16c340f2ee56347e8d5fc5f3ea2074')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3fb7ec817d38636bae8deb93ee092f63')"
     ]
   }
 }
