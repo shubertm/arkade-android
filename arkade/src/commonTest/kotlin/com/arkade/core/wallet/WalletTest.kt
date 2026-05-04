@@ -203,4 +203,12 @@ class HDWalletTest : WalletTest() {
             }
         }
     }
+
+    @Test
+    fun should_load_null_wallet_for_nonexistent_fingerprint() {
+        runTest {
+            val wallet = Wallet.loadByFingerprint("00000000", testDb)
+            assertEquals(null, wallet)
+        }
+    }
 }

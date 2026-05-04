@@ -79,7 +79,18 @@ interface Wallet {
      *
      * @return The wallet's fingerprint if it exists (`type` is `HD`), `null` otherwise.
      */
-    fun fingerprint(): String? = if (type == Type.HD) accountDescriptor.substringAfter("[").substringBefore("/") else null
+    fun fingerprint(): String? {
+        return if (type == Type.HD) {
+            with(accountDescriptor.substringAfter("[", "")) {
+                if (this.isEmpty()) return@with null
+                val fingerprint = this.substringBefore("/", "")
+                if (fingerprint.isEmpty()) return@with null
+                fingerprint
+            }
+        } else {
+            null
+        }
+    }
 
     enum class Type {
         HD,
