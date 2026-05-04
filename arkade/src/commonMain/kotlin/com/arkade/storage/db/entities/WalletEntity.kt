@@ -13,6 +13,7 @@ data class WalletEntity(
     val secret: String,
     val destination: String?,
     val type: Wallet.Type,
+    val fingerprint: String?,
     val accountDescriptor: String,
     val lastUsedIndex: Int,
 ) {

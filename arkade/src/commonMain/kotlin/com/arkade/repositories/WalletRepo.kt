@@ -20,6 +20,14 @@ interface WalletRepo {
     suspend fun loadWalletById(id: String): Wallet?
 
     /**
+     * Retrieve a wallet by its `fingerprint`.
+     *
+     * @param fingerprint The wallet's fingerprint.
+     * @return The [Wallet] with the given `fingerprint` if it exists, `null` otherwise.
+     */
+    suspend fun loadWalletByFingerprint(fingerprint: String): Wallet?
+
+    /**
      * Loads all wallets available in the repository.
      *
      * @return A list of [Wallet] objects; empty if no wallets are found.

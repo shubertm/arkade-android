@@ -12,6 +12,14 @@ interface Storage {
     suspend fun loadWalletById(id: String): WalletEntity?
 
     /**
+     * Loads the wallet with the given fingerprint.
+     *
+     * @param fingerprint The wallet's fingerprint.
+     * @return [WalletEntity] if a wallet with the specified `fingerprint` exists, `null` otherwise.
+     */
+    suspend fun loadWalletByFingerprint(fingerprint: String): WalletEntity?
+
+    /**
      * Loads all persisted wallets.
      *
      * @return A list of stored [WalletEntity] objects; an empty list if no wallets are found.

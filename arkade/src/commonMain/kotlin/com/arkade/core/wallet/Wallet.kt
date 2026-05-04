@@ -63,7 +63,23 @@ interface Wallet {
      * @return A `WalletEntity` containing this wallet's `id`, `secret`, optional `destination`,
      * `type`, `accountDescriptor`, and `lastUsedIndex`.
      */
-    fun toRoomEntity(): WalletEntity = WalletEntity(id, secret, destination, type, accountDescriptor, lastUsedIndex)
+    fun toRoomEntity(): WalletEntity =
+        WalletEntity(
+            id,
+            secret,
+            destination,
+            type,
+            fingerprint(),
+            accountDescriptor,
+            lastUsedIndex,
+        )
+
+    /**
+     * Retrieves the wallet's fingerprint.
+     *
+     * @return The wallet's fingerprint if it exists (`type` is `HD`), `null` otherwise.
+     */
+    fun fingerprint(): String? = if (type == Type.HD) accountDescriptor.substringAfter("[").substringBefore("/") else null
 
     enum class Type {
         HD,
@@ -126,6 +142,23 @@ interface Wallet {
             }
 
         /**
+         * Load a wallet by its fingerprint from persistent storage.
+         *
+         * @param fingerprint The wallet fingerprint to look up.
+         * @param testDb Optional database instance used for repository initialization
+         * (primarily for tests).
+         * @return The wallet with the given `fingerprint`, or `null` if no matching wallet is found.
+         */
+        suspend fun loadByFingerprint(
+            fingerprint: String,
+            testDb: Database? = null,
+        ): Wallet? =
+            withContext(Dispatchers.IO) {
+                val repo: WalletRepo = ArkadeDI.arkadeKoin.get { parametersOf(testDb) }
+                repo.loadWalletByFingerprint(fingerprint)
+            }
+
+        /**
          * Builds a Taproot output descriptor from an nsec-encoded private key.
          *
          * @param nsec The nsec (Bech32) encoded private key string.
@@ -134,6 +167,23 @@ interface Wallet {
         fun getOutputDescriptorFromNSec(nsec: String): String {
             val privateKey = getPrivateKeyFromNSec(nsec)
             return "tr(${privateKey.publicKey().xOnly().value.toHex()})"
+        }
+
+        /**
+         * Derives a master key from the provided mnemonic phrase.
+         *
+         * @param mnemonics is the mnemonic phrase to use for key derivation.
+         * @return A pair containing the derived master key and its fingerprint.
+         */
+        fun masterKeyFromSecret(mnemonics: String): Pair<DeterministicWallet.ExtendedPrivateKey, String> {
+            val seed = MnemonicCode.toSeed(mnemonics, "")
+            val masterKey = DeterministicWallet.generate(seed)
+            val fingerprint =
+                masterKey.extendedPublicKey
+                    .fingerprint()
+                    .toString(16)
+                    .padStart(8, '0')
+            return masterKey to fingerprint
         }
 
         /**
@@ -185,8 +235,7 @@ interface Wallet {
                 MnemonicCode.validate(mnemonics)
             }.onFailure { throw it }
 
-            val seed = MnemonicCode.toSeed(mnemonics, "")
-            val masterKey = DeterministicWallet.generate(seed)
+            val (masterKey, fingerprint) = masterKeyFromSecret(mnemonics)
 
             fun encodePubKeyByNetwork(
                 pubKey: DeterministicWallet.ExtendedPublicKey,
@@ -196,11 +245,6 @@ interface Wallet {
                     Network.MAINNET -> pubKey.encode(false)
                     else -> pubKey.encode(true)
                 }
-            val fingerprint =
-                masterKey.extendedPublicKey
-                    .fingerprint()
-                    .toString(16)
-                    .padStart(8, '0')
             val coinType =
                 when (serverInfo.network) {
                     Network.MAINNET -> 0
