@@ -20,6 +20,8 @@ class ArkNoteContract(
 ) : ArkContract(walletId, null) {
     override val type = TYPE
 
+    override val defaultScope: ContractScope = ContractScope.OFF_CHAIN
+
     val hash = sha256(preimage)
     val outpoint = OutPoint(TxId(hash), 0)
 

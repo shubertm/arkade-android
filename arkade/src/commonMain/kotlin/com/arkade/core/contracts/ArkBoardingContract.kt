@@ -37,6 +37,8 @@ class ArkBoardingContract(
 ) : ArkContract(walletId, serverDescriptor) {
     override val type: String = TYPE
 
+    override val defaultScope: ContractScope = ContractScope.ON_CHAIN
+
     /**
      * Returns the on-chain Bitcoin P2TR address for this boarding contract on the given [network].
      *

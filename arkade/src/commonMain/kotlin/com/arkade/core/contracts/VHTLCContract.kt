@@ -63,6 +63,8 @@ class VHTLCContract(
 
     override val type: String = TYPE
 
+    override val defaultScope: ContractScope = ContractScope.OFF_CHAIN
+
     override fun getTapLeafScripts(): List<ByteArray> {
         val claimScript = claimScript()
         val cooperativeScript = cooperativeScript()

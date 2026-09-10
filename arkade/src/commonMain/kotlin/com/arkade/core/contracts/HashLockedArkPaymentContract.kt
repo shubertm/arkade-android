@@ -29,6 +29,8 @@ class HashLockedArkPaymentContract(
     ) {
     override val type: String = TYPE
 
+    override val defaultScope: ContractScope = ContractScope.OFF_CHAIN
+
     val hash =
         when (hashLockType) {
             HashLockTapScript.HashLockType.HASH160 -> hash160(preimage)

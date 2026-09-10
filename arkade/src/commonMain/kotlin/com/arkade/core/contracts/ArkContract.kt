@@ -38,6 +38,8 @@ abstract class ArkContract(
      */
     abstract val type: String
 
+    abstract val defaultScope: ContractScope
+
     /**
      * Returns the serialized representation of this contract as an `arkcontract` query string.
      *

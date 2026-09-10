@@ -21,6 +21,8 @@ class ArkDelegateContract(
 ) : ArkContract(walletId, serverDescriptor) {
     override val type: String = TYPE
 
+    override val defaultScope: ContractScope = ContractScope.OFF_CHAIN
+
     override fun getTapLeafScripts(): List<ByteArray> {
         val collaborativeScript = collaborativeScript()
         val exitScript = exitScript()

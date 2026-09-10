@@ -16,6 +16,8 @@ class ArkPaymentContract(
 ) : ArkContract(walletId, serverDescriptor) {
     override val type: String = TYPE
 
+    override val defaultScope: ContractScope = ContractScope.OFF_CHAIN
+
     override fun getTapLeafScripts(): List<ByteArray> {
         requireNotNull(serverDescriptor) { "Invalid signer descriptor" }
         val serverPubKey = pubKeyFromTaprootDescriptor(serverDescriptor).toXOnlyPubKey()
