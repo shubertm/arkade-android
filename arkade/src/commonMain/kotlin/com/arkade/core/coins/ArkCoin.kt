@@ -17,7 +17,7 @@ data class ArkCoin(
     val expiresAtHeight: Long,
     val outpoint: OutPoint,
     val txOut: TxOut,
-    val signerDescriptor: String,
+    val signerDescriptor: String?,
     val spendingScriptPath: ScriptSpendingPath,
     val spendingConditionWitness: ScriptWitness?,
     val lockTime: Long?,
@@ -25,7 +25,7 @@ data class ArkCoin(
     val isSpent: Boolean,
     val isSwept: Boolean,
     val isUnrolled: Boolean,
-    val assets: List<Asset>,
+    val assets: List<Asset>?,
 ) {
     init {
         val script = Script.parse(spendingScriptPath.script)

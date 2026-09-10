@@ -12,8 +12,6 @@ import com.arkade.core.taproot.pubKeyFromTaprootDescriptor
 import com.arkade.core.toXOnlyPubKey
 import com.arkade.core.vtxos.ScriptSpendingPath
 import com.arkade.core.vtxos.Vtxo
-import fr.acinq.bitcoin.ByteVector
-import fr.acinq.bitcoin.Script
 
 /**
  * An Arkade boarding contract that allows a user to move on-chain Bitcoin funds into the Arkade protocol.
@@ -38,6 +36,8 @@ class ArkBoardingContract(
     private val exitDelay: Long,
 ) : ArkContract(walletId, serverDescriptor) {
     override val type: String = TYPE
+
+    override val defaultScope: ContractScope = ContractScope.ON_CHAIN
 
     /**
      * Returns the on-chain Bitcoin P2TR address for this boarding contract on the given [network].
@@ -81,6 +81,7 @@ class ArkBoardingContract(
      * @return a list containing [collaborativeExitScript, unilateralExitScript].
      */
     override fun getTapLeafScripts(): List<ByteArray> {
+        requireNotNull(serverDescriptor) { "Invalid server descriptor" }
         val serverPubKey = pubKeyFromTaprootDescriptor(serverDescriptor).toXOnlyPubKey()
         val userPubKey = pubKeyFromTaprootDescriptor(userDescriptor).toXOnlyPubKey()
         val collaborativeScript = multisigScript(serverPubKey, userPubKey)
@@ -96,12 +97,14 @@ class ArkBoardingContract(
      *
      * @return a map with keys `server`, `user`, and `exit_delay`.
      */
-    override fun getAdditionalData(): Map<String, String> =
-        mapOf(
+    override fun getAdditionalData(): Map<String, String> {
+        requireNotNull(serverDescriptor) { "Invalid server descriptor" }
+        return mapOf(
             "server" to serverDescriptor,
             "user" to userDescriptor,
             "exit_delay" to exitDelay.toString(),
         )
+    }
 
     override suspend fun toArkCoin(vtxo: Vtxo.Data): ArkCoin =
         ArkCoin(
@@ -141,20 +144,6 @@ class ArkBoardingContract(
             unilateralScript,
             controlBlock,
         )
-    }
-
-    private fun getControlBlock(script: ByteArray): ByteArray {
-        val spendingInfo = getTaprootSpendingInfo()
-        val spendingLeaf =
-            spendingInfo.merkleScriptTree.findScript(ByteVector(script))
-                ?: throw IllegalArgumentException("Invalid leaf script")
-
-        return Script.ControlBlock
-            .build(
-                spendingInfo.internalKey,
-                spendingInfo.merkleScriptTree,
-                spendingLeaf,
-            ).toByteArray()
     }
 
     companion object {

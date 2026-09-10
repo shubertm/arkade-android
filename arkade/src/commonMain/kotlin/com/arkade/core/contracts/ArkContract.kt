@@ -10,6 +10,8 @@ import com.arkade.core.taproot.TaprootSpendingInfo
 import com.arkade.core.taproot.pubKeyFromTaprootDescriptor
 import com.arkade.core.toXOnlyPubKey
 import com.arkade.core.vtxos.Vtxo
+import fr.acinq.bitcoin.ByteVector
+import fr.acinq.bitcoin.Script
 
 /**
  * Abstract base class for all Arkade contracts.
@@ -28,13 +30,15 @@ import com.arkade.core.vtxos.Vtxo
  */
 abstract class ArkContract(
     val walletId: String,
-    protected val serverDescriptor: String,
+    protected val serverDescriptor: String?,
 ) {
     /**
      * The contract type identifier used for serialization and parser dispatch.
      * Must be unique across all registered contract types.
      */
     abstract val type: String
+
+    abstract val defaultScope: ContractScope
 
     /**
      * Returns the serialized representation of this contract as an `arkcontract` query string.
@@ -65,6 +69,7 @@ abstract class ArkContract(
      */
     open fun getArkAddress(network: Network): ArkAddress {
         val taprootSpendingInfo = getTaprootSpendingInfo()
+        requireNotNull(serverDescriptor) { "Missing server descriptor" }
         return ArkAddress.create(
             network,
             pubKeyFromTaprootDescriptor(serverDescriptor).hexToByteArray(),
@@ -110,6 +115,20 @@ abstract class ArkContract(
                 scriptTree,
             )
         return taprootSpendingInfo
+    }
+
+    protected fun getControlBlock(script: ByteArray): ByteArray {
+        val spendingInfo = getTaprootSpendingInfo()
+        val spendingLeaf =
+            spendingInfo.merkleScriptTree.findScript(ByteVector(script))
+                ?: throw IllegalArgumentException("Invalid leaf script")
+
+        return Script.ControlBlock
+            .build(
+                spendingInfo.internalKey,
+                spendingInfo.merkleScriptTree,
+                spendingLeaf,
+            ).toByteArray()
     }
 
     /**
